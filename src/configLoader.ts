@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import fetch from 'node-fetch';
 
-const CONFIG_URL = 'https://raw.githubusercontent.com/<your-org-or-user>/<your-repo>/main/config/devtwin-config.json';
+const CONFIG_URL = 'https://raw.githubusercontent.com/kristianleonhardanticimex/DevTwin/main/config/devtwin-config.json';
 const CACHE_DIR = path.join(__dirname, '../../.devtwin-cache');
 const CACHE_FILE = path.join(CACHE_DIR, 'devtwin-config.json');
 
