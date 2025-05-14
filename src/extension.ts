@@ -2,6 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { refreshConfig } from './configLoader';
+import { CategoryTreeProvider } from './categoryTree';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -31,6 +32,9 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(disposableRefreshConfig);
+
+	const categoryTreeProvider = new CategoryTreeProvider();
+	vscode.window.registerTreeDataProvider('devtwinCategories', categoryTreeProvider);
 }
 
 // This method is called when your extension is deactivated

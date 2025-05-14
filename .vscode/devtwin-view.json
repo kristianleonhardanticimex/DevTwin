@@ -1,0 +1,10 @@
+{
+    "views": {
+        "explorer": [
+            {
+                "id": "devtwinCategories",
+                "name": "DevTwin Categories"
+            }
+        ]
+    }
+}

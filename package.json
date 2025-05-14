@@ -17,7 +17,16 @@
         "command": "devtwin-copilot-instruction-builder.helloWorld",
         "title": "Hello World"
       }
-    ]
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "devtwinCategories",
+          "name": "DevTwin Categories",
+          "icon": "resources/devtwin.svg"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
