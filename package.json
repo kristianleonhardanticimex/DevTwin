@@ -25,6 +25,13 @@
           "name": "DevTwin Categories",
           "icon": "resources/devtwin.svg"
         }
+      ],
+      "sidebar": [
+        {
+          "id": "devtwin.subcategoryPanel",
+          "name": "DevTwin Subcategories",
+          "icon": "resources/devtwin.svg"
+        }
       ]
     }
   },
