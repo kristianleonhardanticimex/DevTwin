@@ -6,7 +6,8 @@ export class CategoryTreeItem extends vscode.TreeItem {
         public readonly label: string,
         public readonly collapsibleState: vscode.TreeItemCollapsibleState,
         public readonly id: string,
-        public readonly description?: string
+        public readonly description?: string,
+        public readonly subcategories?: any[]
     ) {
         super(label, collapsibleState);
         this.tooltip = description;
@@ -42,11 +43,17 @@ export class CategoryTreeProvider implements vscode.TreeDataProvider<CategoryTre
             // Top-level: categories
             return Promise.resolve(
                 this.categories.map((cat: any) =>
-                    new CategoryTreeItem(cat.name, vscode.TreeItemCollapsibleState.None, cat.id, cat.description)
+                    new CategoryTreeItem(cat.name, vscode.TreeItemCollapsibleState.Collapsed, cat.id, cat.description, cat.subcategories)
+                )
+            );
+        } else if (element.subcategories) {
+            // Subcategories as children
+            return Promise.resolve(
+                element.subcategories.map((sub: any) =>
+                    new CategoryTreeItem(sub.name, vscode.TreeItemCollapsibleState.None, sub.id, sub.description)
                 )
             );
         }
-        // No children for now (categories only)
         return Promise.resolve([]);
     }
 }
