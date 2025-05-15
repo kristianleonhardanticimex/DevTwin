@@ -90,11 +90,19 @@ export async function handleApplySelection(selection: { subcategories: string[];
         }
     }
     // Write to .github/copilot-instructions.md, backup if exists
-    const githubDir = path.join(vscode.workspace.workspaceFolders?.[0].uri.fsPath || '', '.github');
-    if (!fs.existsSync(githubDir)) { fs.mkdirSync(githubDir); }
-    const outFile = path.join(githubDir, 'copilot-instructions.md');
-    const bakFile = path.join(githubDir, 'copilot-instructions.bak.md');
-    if (fs.existsSync(outFile)) { fs.copyFileSync(outFile, bakFile); }
-    fs.writeFileSync(outFile, output, 'utf-8');
-    vscode.window.showInformationMessage('.github/copilot-instructions.md generated!');
+    try {
+        const githubDir = path.join(vscode.workspace.workspaceFolders?.[0].uri.fsPath || '', '.github');
+        if (!fs.existsSync(githubDir)) { fs.mkdirSync(githubDir); }
+        const outFile = path.join(githubDir, 'copilot-instructions.md');
+        const bakFile = path.join(githubDir, 'copilot-instructions.bak.md');
+        if (fs.existsSync(outFile)) { fs.copyFileSync(outFile, bakFile); }
+        fs.writeFileSync(outFile, output, 'utf-8');
+        vscode.window.showInformationMessage('.github/copilot-instructions.md generated!', 'Open File').then(selection => {
+            if (selection === 'Open File') {
+                vscode.window.showTextDocument(vscode.Uri.file(outFile));
+            }
+        });
+    } catch (err: any) {
+        vscode.window.showErrorMessage('Failed to generate .github/copilot-instructions.md: ' + (err && err.message ? err.message : String(err)));
+    }
 }
