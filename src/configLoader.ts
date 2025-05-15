@@ -12,7 +12,7 @@ export async function loadConfig(): Promise<any> {
     // Try to fetch from GitHub
     try {
         const res = await fetch(CONFIG_URL);
-        if (!res.ok) throw new Error('Network response was not ok');
+        if (!res.ok) {throw new Error('Network response was not ok');}
         const json = await res.json();
         await cacheConfig(json);
         return json;
@@ -39,7 +39,7 @@ export async function refreshConfig(): Promise<any> {
     // Force reload from GitHub
     try {
         const res = await fetch(CONFIG_URL);
-        if (!res.ok) throw new Error('Network response was not ok');
+        if (!res.ok) {throw new Error('Network response was not ok');}
         const json = await res.json();
         await cacheConfig(json);
         vscode.window.showInformationMessage('DevTwin config refreshed from GitHub.');

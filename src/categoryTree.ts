@@ -90,14 +90,15 @@ export class SubcategoryPanelProvider implements vscode.WebviewViewProvider {
             html += `<h3>${selectedCategory.name}</h3>`;
             for (const sub of selectedCategory.subcategories) {
                 html += `<div style='margin-bottom: 1em;'>`;
-                html += `<label><input type='checkbox' data-subcategory='${sub.id}' /> <b>${sub.name}</b></label>`;
+                html += `<label><input type='checkbox' class='subcategory' data-subcategory='${sub.id}' ${sub.defaultFeatures && sub.defaultFeatures.length > 0 ? 'checked' : ''}/> <b>${sub.name}</b></label>`;
                 if (sub.description) {
                     html += ` <span title='${sub.description}' style='cursor:help;'>ℹ️</span>`;
                 }
                 if (sub.features && sub.features.length > 0) {
                     html += `<ul>`;
                     for (const feat of sub.features) {
-                        html += `<li><label><input type='checkbox' data-feature='${feat.id}' data-parent='${sub.id}' /> ${feat.name}`;
+                        const isDefault = sub.defaultFeatures && sub.defaultFeatures.includes(feat.id);
+                        html += `<li><label><input type='checkbox' class='feature' data-feature='${feat.id}' data-parent='${sub.id}' ${isDefault ? 'checked' : ''} ${isDefault ? '' : 'disabled'}/> ${feat.name}`;
                         if (feat.description) {
                             html += ` <span title='${feat.description}' style='cursor:help;'>ℹ️</span>`;
                         }
@@ -109,6 +110,28 @@ export class SubcategoryPanelProvider implements vscode.WebviewViewProvider {
             }
         }
         html += `<button id='applySelection'>Apply Selection</button>`;
+        html += `<script>
+        // Handle subcategory and feature selection logic
+        document.querySelectorAll('.subcategory').forEach(function(subEl) {
+            subEl.addEventListener('change', function() {
+                var subId = this.getAttribute('data-subcategory');
+                var checked = this.checked;
+                document.querySelectorAll("input.feature[data-parent='" + subId + "']").forEach(function(fEl) {
+                    fEl.disabled = !checked;
+                    if (!checked) fEl.checked = false;
+                });
+            });
+        });
+        // Default features logic
+        document.querySelectorAll('.subcategory').forEach(function(subEl) {
+            var subId = subEl.getAttribute('data-subcategory');
+            if (subEl.checked) {
+                document.querySelectorAll("input.feature[data-parent='" + subId + "']").forEach(function(fEl) {
+                    if (fEl.hasAttribute('checked')) fEl.checked = true;
+                });
+            }
+        });
+        </script>`;
         this._view.webview.html = html;
     }
 }
