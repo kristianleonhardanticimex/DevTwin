@@ -55,6 +55,18 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		})
 	);
+
+	// Listen for messages from the webview
+	vscode.window.registerWebviewViewProvider('devtwin.subcategoryPanel', {
+		resolveWebviewView(webviewView) {
+			webviewView.webview.onDidReceiveMessage(async (message) => {
+				if (message.command === 'applySelection') {
+					// TODO: Handle selection and generate markdown file
+					vscode.window.showInformationMessage('Apply Selection clicked. Selected: ' + JSON.stringify(message.data));
+				}
+			});
+		}
+	});
 }
 
 // This method is called when your extension is deactivated

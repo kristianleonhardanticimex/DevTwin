@@ -131,6 +131,19 @@ export class SubcategoryPanelProvider implements vscode.WebviewViewProvider {
                 });
             }
         });
+        // Apply Selection button logic
+        document.getElementById('applySelection').addEventListener('click', function() {
+            var selected = { subcategories: [], features: [] };
+            document.querySelectorAll('.subcategory').forEach(function(subEl) {
+                if (subEl.checked) selected.subcategories.push(subEl.getAttribute('data-subcategory'));
+            });
+            document.querySelectorAll('.feature').forEach(function(featEl) {
+                if (featEl.checked && !featEl.disabled) selected.features.push(featEl.getAttribute('data-feature'));
+            });
+            // Send message to extension
+            const vscodeApi = acquireVsCodeApi();
+            vscodeApi.postMessage({ command: 'applySelection', data: selected });
+        });
         </script>`;
         this._view.webview.html = html;
     }
