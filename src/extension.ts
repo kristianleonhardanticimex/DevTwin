@@ -5,6 +5,8 @@ import { refreshConfig } from './configLoader';
 import { CategoryTreeProvider } from './categoryTree';
 import { SubcategoryPanelProvider } from './categoryTree';
 
+let subcategoryPanelProvider: SubcategoryPanelProvider | undefined;
+
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -37,11 +39,21 @@ export function activate(context: vscode.ExtensionContext) {
 	const categoryTreeProvider = new CategoryTreeProvider();
 	vscode.window.registerTreeDataProvider('devtwinCategories', categoryTreeProvider);
 
+	subcategoryPanelProvider = new SubcategoryPanelProvider(context);
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider(
 			'devtwin.subcategoryPanel',
-			new SubcategoryPanelProvider(context)
+			subcategoryPanelProvider
 		)
+	);
+
+	// Register category selection command
+	context.subscriptions.push(
+		vscode.commands.registerCommand('devtwin.selectCategory', (categoryId: string) => {
+			if (subcategoryPanelProvider) {
+				subcategoryPanelProvider.updateWebview(categoryId);
+			}
+		})
 	);
 }
 

@@ -11,6 +11,11 @@ export class CategoryTreeItem extends vscode.TreeItem {
     ) {
         super(label, collapsibleState);
         this.tooltip = description;
+        this.command = {
+            command: 'devtwin.selectCategory',
+            title: 'Select Category',
+            arguments: [this.id]
+        };
     }
 }
 
