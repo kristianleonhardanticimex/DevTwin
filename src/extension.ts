@@ -1,7 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { refreshConfig } from './configLoader';
+import { refreshConfig, handleApplySelection } from './configLoader';
 import { CategoryTreeProvider } from './categoryTree';
 import { SubcategoryPanelProvider } from './categoryTree';
 
@@ -61,8 +61,7 @@ export function activate(context: vscode.ExtensionContext) {
 		resolveWebviewView(webviewView) {
 			webviewView.webview.onDidReceiveMessage(async (message) => {
 				if (message.command === 'applySelection') {
-					// TODO: Handle selection and generate markdown file
-					vscode.window.showInformationMessage('Apply Selection clicked. Selected: ' + JSON.stringify(message.data));
+					await handleApplySelection(message.data);
 				}
 			});
 		}
