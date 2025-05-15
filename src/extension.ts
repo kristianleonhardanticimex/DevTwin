@@ -4,8 +4,10 @@ import * as vscode from 'vscode';
 import { refreshConfig, handleApplySelection } from './configLoader';
 import { CategoryTreeProvider } from './categoryTree';
 import { SubcategoryPanelProvider } from './categoryTree';
+import { DevTwinPanelProvider } from './categoryTree';
 
 let subcategoryPanelProvider: SubcategoryPanelProvider | undefined;
+let devTwinPanelProvider: DevTwinPanelProvider | undefined;
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -66,6 +68,15 @@ export function activate(context: vscode.ExtensionContext) {
 			});
 		}
 	});
+
+	devTwinPanelProvider = new DevTwinPanelProvider(context);
+	context.subscriptions.push(
+		vscode.commands.registerCommand('devtwin.openPanel', async () => {
+			if (devTwinPanelProvider) {
+				await devTwinPanelProvider.showPanel();
+			}
+		})
+	);
 }
 
 // This method is called when your extension is deactivated

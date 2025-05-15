@@ -16,6 +16,10 @@
       {
         "command": "devtwin-copilot-instruction-builder.helloWorld",
         "title": "Hello World"
+      },
+      {
+        "command": "devtwin.openPanel",
+        "title": "DevTwin: Open Instruction Builder"
       }
     ],
     "views": {

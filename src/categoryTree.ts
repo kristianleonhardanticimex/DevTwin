@@ -1,150 +1,112 @@
 import * as vscode from 'vscode';
 import { loadConfig } from './configLoader';
 
-export class CategoryTreeItem extends vscode.TreeItem {
-    constructor(
-        public readonly label: string,
-        public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-        public readonly id: string,
-        public readonly description?: string,
-        public readonly subcategories?: any[]
-    ) {
-        super(label, collapsibleState);
-        this.tooltip = description;
-        this.command = {
-            command: 'devtwin.selectCategory',
-            title: 'Select Category',
-            arguments: [this.id]
-        };
-    }
-}
+export class DevTwinPanelProvider {
+    public static readonly viewType = 'devtwin.panel';
+    private panel: vscode.WebviewPanel | undefined;
+    private context: vscode.ExtensionContext;
 
-export class CategoryTreeProvider implements vscode.TreeDataProvider<CategoryTreeItem> {
-    private _onDidChangeTreeData: vscode.EventEmitter<CategoryTreeItem | undefined | void> = new vscode.EventEmitter<CategoryTreeItem | undefined | void>();
-    readonly onDidChangeTreeData: vscode.Event<CategoryTreeItem | undefined | void> = this._onDidChangeTreeData.event;
-
-    private categories: any[] = [];
-
-    constructor() {
-        this.refresh();
+    constructor(context: vscode.ExtensionContext) {
+        this.context = context;
     }
 
-    async refresh(): Promise<void> {
-        try {
-            const config = await loadConfig();
-            this.categories = config.categories || [];
-            this._onDidChangeTreeData.fire();
-        } catch (err) {
-            this.categories = [];
-        }
-    }
-
-    getTreeItem(element: CategoryTreeItem): vscode.TreeItem {
-        return element;
-    }
-
-    getChildren(element?: CategoryTreeItem): Thenable<CategoryTreeItem[]> {
-        if (!element) {
-            // Top-level: categories
-            return Promise.resolve(
-                this.categories.map((cat: any) =>
-                    new CategoryTreeItem(cat.name, vscode.TreeItemCollapsibleState.Collapsed, cat.id, cat.description, cat.subcategories)
-                )
+    public async showPanel() {
+        if (!this.panel) { 
+            this.panel = vscode.window.createWebviewPanel(
+                DevTwinPanelProvider.viewType,
+                'DevTwin Instruction Builder',
+                vscode.ViewColumn.One,
+                { enableScripts: true }
             );
-        } else if (element.subcategories) {
-            // Subcategories as children
-            return Promise.resolve(
-                element.subcategories.map((sub: any) =>
-                    new CategoryTreeItem(sub.name, vscode.TreeItemCollapsibleState.None, sub.id, sub.description)
-                )
-            );
-        }
-        return Promise.resolve([]);
-    }
-}
-
-export class SubcategoryPanelProvider implements vscode.WebviewViewProvider {
-    public static readonly viewType = 'devtwin.subcategoryPanel';
-    private _view?: vscode.WebviewView;
-
-    constructor(private readonly context: vscode.ExtensionContext) {}
-
-    public resolveWebviewView(
-        webviewView: vscode.WebviewView,
-        context: vscode.WebviewViewResolveContext,
-        _token: vscode.CancellationToken
-    ) {
-        this._view = webviewView;
-        webviewView.webview.options = {
-            enableScripts: true
-        };
-        this.updateWebview();
-    }
-
-    public async updateWebview(selectedCategoryId?: string) {
-        if (!this._view) { return; }
-        const config = await loadConfig();
-        let html = `<h2>DevTwin Subcategories & Features</h2>`;
-        let selectedCategory = config.categories.find((cat: any) => cat.id === selectedCategoryId) || config.categories[0];
-        if (selectedCategory) {
-            html += `<h3>${selectedCategory.name}</h3>`;
-            for (const sub of selectedCategory.subcategories) {
-                html += `<div style='margin-bottom: 1em;'>`;
-                html += `<label><input type='checkbox' class='subcategory' data-subcategory='${sub.id}' ${sub.defaultFeatures && sub.defaultFeatures.length > 0 ? 'checked' : ''}/> <b>${sub.name}</b></label>`;
-                if (sub.description) {
-                    html += ` <span title='${sub.description}' style='cursor:help;'>ℹ️</span>`;
+            this.panel.onDidDispose(() => { this.panel = undefined; });
+            await this.updateWebview();
+            this.panel.webview.onDidReceiveMessage(async (message) => {
+                if (message.command === 'applySelection') {
+                    // Direct import for TypeScript/Node
+                    const { handleApplySelection } = require('./configLoader');
+                    await handleApplySelection(message.data);
                 }
+            });
+        } else {
+            this.panel.reveal();
+        }
+    }
+
+    public async updateWebview() {
+        if (!this.panel) { return; }
+        const config = await loadConfig();
+        let html = `
+        <style>
+        body { font-family: sans-serif; margin: 0; padding: 0; }
+        .search { width: 100%; padding: 8px; font-size: 1em; margin-bottom: 10px; }
+        .category { margin-top: 1em; }
+        .subcategory { margin-left: 1em; }
+        .feature { margin-left: 2em; }
+        .info { cursor: help; }
+        </style>
+        <input class='search' type='text' placeholder='Search categories, subcategories, features...' oninput='filterItems()'/>
+        <div id='content'>
+        `;
+        for (const cat of config.categories) {
+            html += `<div class='category'><b>${cat.name}</b> <span class='info' title='${cat.description || ''}'>ℹ️</span>`;
+            for (const sub of cat.subcategories) {
+                html += `<div class='subcategory'><label><input type='checkbox' class='subcategory-checkbox' data-subcategory='${sub.id}'/> ${sub.name}</label> <span class='info' title='${sub.description || ''}'>ℹ️</span>`;
                 if (sub.features && sub.features.length > 0) {
-                    html += `<ul>`;
                     for (const feat of sub.features) {
-                        const isDefault = sub.defaultFeatures && sub.defaultFeatures.includes(feat.id);
-                        html += `<li><label><input type='checkbox' class='feature' data-feature='${feat.id}' data-parent='${sub.id}' ${isDefault ? 'checked' : ''} ${isDefault ? '' : 'disabled'}/> ${feat.name}`;
-                        if (feat.description) {
-                            html += ` <span title='${feat.description}' style='cursor:help;'>ℹ️</span>`;
-                        }
-                        html += `</label></li>`;
+                        html += `<div class='feature'><label><input type='checkbox' class='feature-checkbox' data-feature='${feat.id}' data-parent='${sub.id}'/> ${feat.name}</label> <span class='info' title='${feat.description || ''}'>ℹ️</span></div>`;
                     }
-                    html += `</ul>`;
                 }
                 html += `</div>`;
             }
+            html += `</div>`;
         }
-        html += `<button id='applySelection'>Apply Selection</button>`;
+        html += `</div><button id='applySelection'>Apply Selection</button>`;
         html += `<script>
-        // Handle subcategory and feature selection logic
-        document.querySelectorAll('.subcategory').forEach(function(subEl) {
+        function filterItems() {
+            var q = document.querySelector('.search').value.toLowerCase();
+            document.querySelectorAll('.category').forEach(function(cat) {
+                var catText = cat.textContent.toLowerCase();
+                var catMatch = catText.includes(q);
+                var anySubMatch = false;
+                cat.querySelectorAll('.subcategory').forEach(function(sub) {
+                    var subText = sub.textContent.toLowerCase();
+                    var subMatch = subText.includes(q);
+                    var anyFeatMatch = false;
+                    sub.querySelectorAll('.feature').forEach(function(feat) {
+                        var featText = feat.textContent.toLowerCase();
+                        var featMatch = featText.includes(q);
+                        feat.style.display = (featMatch || subMatch || catMatch) ? '' : 'none';
+                        if (featMatch) anyFeatMatch = true;
+                    });
+                    sub.style.display = (subMatch || catMatch || anyFeatMatch) ? '' : 'none';
+                    if (subMatch || anyFeatMatch) anySubMatch = true;
+                });
+                cat.style.display = (catMatch || anySubMatch) ? '' : 'none';
+            });
+        }
+        // Selection logic
+        document.querySelectorAll('.subcategory-checkbox').forEach(function(subEl) {
             subEl.addEventListener('change', function() {
                 var subId = this.getAttribute('data-subcategory');
                 var checked = this.checked;
-                document.querySelectorAll("input.feature[data-parent='" + subId + "']").forEach(function(fEl) {
+                document.querySelectorAll(".feature-checkbox[data-parent='" + subId + "']").forEach(function(fEl) {
                     fEl.disabled = !checked;
                     if (!checked) fEl.checked = false;
                 });
             });
         });
-        // Default features logic
-        document.querySelectorAll('.subcategory').forEach(function(subEl) {
-            var subId = subEl.getAttribute('data-subcategory');
-            if (subEl.checked) {
-                document.querySelectorAll("input.feature[data-parent='" + subId + "']").forEach(function(fEl) {
-                    if (fEl.hasAttribute('checked')) fEl.checked = true;
-                });
-            }
-        });
-        // Apply Selection button logic
         document.getElementById('applySelection').addEventListener('click', function() {
             var selected = { subcategories: [], features: [] };
-            document.querySelectorAll('.subcategory').forEach(function(subEl) {
+            document.querySelectorAll('.subcategory-checkbox').forEach(function(subEl) {
                 if (subEl.checked) selected.subcategories.push(subEl.getAttribute('data-subcategory'));
             });
-            document.querySelectorAll('.feature').forEach(function(featEl) {
+            document.querySelectorAll('.feature-checkbox').forEach(function(featEl) {
                 if (featEl.checked && !featEl.disabled) selected.features.push(featEl.getAttribute('data-feature'));
             });
-            // Send message to extension
             const vscodeApi = acquireVsCodeApi();
             vscodeApi.postMessage({ command: 'applySelection', data: selected });
         });
         </script>`;
-        this._view.webview.html = html;
+        this.panel.webview.html = html;
     }
 }
