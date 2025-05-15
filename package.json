@@ -14,30 +14,18 @@
   "contributes": {
     "commands": [
       {
-        "command": "devtwin-copilot-instruction-builder.helloWorld",
-        "title": "Hello World"
-      },
-      {
         "command": "devtwin.openPanel",
         "title": "DevTwin: Open Instruction Builder"
+      },
+      {
+        "command": "devtwin.refreshConfig",
+        "title": "DevTwin: Refresh Config"
+      },
+      {
+        "command": "devtwin-copilot-instruction-builder.helloWorld",
+        "title": "Hello World from DevTwin Copilot Instruction Builder!"
       }
-    ],
-    "views": {
-      "explorer": [
-        {
-          "id": "devtwinCategories",
-          "name": "DevTwin Categories",
-          "icon": "resources/devtwin.svg"
-        }
-      ],
-      "sidebar": [
-        {
-          "id": "devtwin.subcategoryPanel",
-          "name": "DevTwin Subcategories",
-          "icon": "resources/devtwin.svg"
-        }
-      ]
-    }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
