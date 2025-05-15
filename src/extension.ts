@@ -1,12 +1,9 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { refreshConfig, handleApplySelection } from './configLoader';
-import { CategoryTreeProvider } from './categoryTree';
-import { SubcategoryPanelProvider } from './categoryTree';
+import { refreshConfig } from './configLoader';
 import { DevTwinPanelProvider } from './categoryTree';
 
-let subcategoryPanelProvider: SubcategoryPanelProvider | undefined;
 let devTwinPanelProvider: DevTwinPanelProvider | undefined;
 
 // This method is called when your extension is activated
@@ -37,37 +34,6 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(disposableRefreshConfig);
-
-	const categoryTreeProvider = new CategoryTreeProvider();
-	vscode.window.registerTreeDataProvider('devtwinCategories', categoryTreeProvider);
-
-	subcategoryPanelProvider = new SubcategoryPanelProvider(context);
-	context.subscriptions.push(
-		vscode.window.registerWebviewViewProvider(
-			'devtwin.subcategoryPanel',
-			subcategoryPanelProvider
-		)
-	);
-
-	// Register category selection command
-	context.subscriptions.push(
-		vscode.commands.registerCommand('devtwin.selectCategory', (categoryId: string) => {
-			if (subcategoryPanelProvider) {
-				subcategoryPanelProvider.updateWebview(categoryId);
-			}
-		})
-	);
-
-	// Listen for messages from the webview
-	vscode.window.registerWebviewViewProvider('devtwin.subcategoryPanel', {
-		resolveWebviewView(webviewView) {
-			webviewView.webview.onDidReceiveMessage(async (message) => {
-				if (message.command === 'applySelection') {
-					await handleApplySelection(message.data);
-				}
-			});
-		}
-	});
 
 	devTwinPanelProvider = new DevTwinPanelProvider(context);
 	context.subscriptions.push(
