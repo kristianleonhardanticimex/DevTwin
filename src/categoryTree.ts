@@ -82,7 +82,7 @@ export class SubcategoryPanelProvider implements vscode.WebviewViewProvider {
     }
 
     public async updateWebview(selectedCategoryId?: string) {
-        if (!this._view) return;
+        if (!this._view) { return; }
         const config = await loadConfig();
         let html = `<h2>DevTwin Subcategories & Features</h2>`;
         let selectedCategory = config.categories.find((cat: any) => cat.id === selectedCategoryId) || config.categories[0];
