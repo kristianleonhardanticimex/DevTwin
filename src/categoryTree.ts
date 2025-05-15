@@ -47,17 +47,19 @@ export class DevTwinPanelProvider {
         .feature { margin-left: 3em; margin-top: 0.2em; }
         .info { cursor: help; color: var(--vscode-descriptionForeground); margin-left: 0.3em; }
         .vscode-button { margin: 1.5em 0 1em 0; }
+        .recommend-banner { background: var(--vscode-editorInfo-background); color: var(--vscode-editorInfo-foreground); border-left: 3px solid var(--vscode-editorInfo-border); padding: 8px 12px; margin: 12px 0; border-radius: 4px; display: flex; align-items: center; gap: 1em; }
         </style>
         <vscode-text-field class='search' placeholder='Search categories, subcategories, features...' onchange='filterItems()'></vscode-text-field>
+        <div id='recommend-banner' style='display:none'></div>
         <div id='content'>
         `;
         for (const cat of config.categories) {
             html += `<div class='category section'><span>${cat.name}</span> <span class='info' title='${cat.description || ''}'>ℹ️</span>`;
             for (const sub of cat.subcategories) {
-                html += `<div class='subcategory'><vscode-checkbox class='subcategory-checkbox' data-subcategory='${sub.id}'>${sub.name}</vscode-checkbox> <span class='info' title='${sub.description || ''}'>ℹ️</span>`;
+                html += `<div class='subcategory'><vscode-checkbox class='subcategory-checkbox' data-subcategory='${sub.id}' data-recommend='${encodeURIComponent(JSON.stringify(sub.recommendations || []))}'>${sub.name}</vscode-checkbox> <span class='info' title='${sub.description || ''}'>ℹ️</span>`;
                 if (sub.features && sub.features.length > 0) {
                     for (const feat of sub.features) {
-                        html += `<div class='feature'><vscode-checkbox class='feature-checkbox' data-feature='${feat.id}' data-parent='${sub.id}'>${feat.name}</vscode-checkbox> <span class='info' title='${feat.description || ''}'>ℹ️</span></div>`;
+                        html += `<div class='feature'><vscode-checkbox class='feature-checkbox' data-feature='${feat.id}' data-parent='${sub.id}' data-recommend='${encodeURIComponent(JSON.stringify(feat.recommendations || []))}'>${feat.name}</vscode-checkbox> <span class='info' title='${feat.description || ''}'>ℹ️</span></div>`;
                     }
                 }
                 html += `</div>`;
@@ -90,14 +92,42 @@ export class DevTwinPanelProvider {
             });
         }
         document.querySelector('.search').addEventListener('input', filterItems);
-        document.querySelectorAll('.subcategory-checkbox').forEach(function(subEl) {
-            subEl.addEventListener('change', function() {
-                var subId = this.getAttribute('data-subcategory');
-                var checked = this.checked;
-                document.querySelectorAll(".feature-checkbox[data-parent='" + subId + "']").forEach(function(fEl) {
-                    fEl.disabled = !checked;
-                    if (!checked) fEl.checked = false;
-                });
+        // Dependency prompt logic
+        function showRecommendationPrompt(recommendations) {
+            if (!recommendations || recommendations.length === 0) return;
+            const banner = document.getElementById('recommend-banner');
+            banner.innerHTML = '';
+            recommendations.forEach(function(rec) {
+                const msg = document.createElement('span');
+                msg.textContent = rec.reason || 'Recommended: ' + rec.id;
+                const btn = document.createElement('vscode-button');
+                btn.textContent = 'Enable ' + rec.id;
+                btn.onclick = function() {
+                    // Try to check the recommended item (feature or subcategory)
+                    var el = document.querySelector('[data-subcategory="' + rec.id + '"]');
+                    if (!el) el = document.querySelector('[data-feature="' + rec.id + '"]');
+                    if (el) { el.checked = true; el.dispatchEvent(new Event('change')); }
+                    banner.style.display = 'none';
+                };
+                banner.appendChild(msg);
+                banner.appendChild(btn);
+            });
+            banner.style.display = 'flex';
+        }
+        document.querySelectorAll('.subcategory-checkbox, .feature-checkbox').forEach(function(el) {
+            el.addEventListener('change', function() {
+                if (this.checked) {
+                    const recs = JSON.parse(decodeURIComponent(this.getAttribute('data-recommend')));
+                    if (recs && recs.length > 0) showRecommendationPrompt(recs);
+                }
+                if (el.classList.contains('subcategory-checkbox')) {
+                    var subId = this.getAttribute('data-subcategory');
+                    var checked = this.checked;
+                    document.querySelectorAll(".feature-checkbox[data-parent='" + subId + "']").forEach(function(fEl) {
+                        fEl.disabled = !checked;
+                        if (!checked) fEl.checked = false;
+                    });
+                }
             });
         });
         document.getElementById('applySelection').addEventListener('click', function() {
