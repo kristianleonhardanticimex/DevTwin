@@ -138,3 +138,46 @@ export async function handleApplySelection(selection: { subcategories: string[];
         vscode.window.showErrorMessage('Failed to generate .github/copilot-instructions.md: ' + (err && err.message ? err.message : String(err)));
     }
 }
+
+// Loads and parses the existing copilot-instructions.md file, returning a map of found blocks and warnings for missing hierarchy
+export async function loadCopilotInstructions(): Promise<{ blocks: Record<string, string>, warnings: string[] }> {
+    const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri.fsPath || '';
+    const filePath = path.join(workspaceRoot, '.github', 'copilot-instructions.md');
+    const blocks: Record<string, string> = {};
+    const warnings: string[] = [];
+    if (!fs.existsSync(filePath)) {
+        vscode.window.showWarningMessage('No .github/copilot-instructions.md file found.');
+        return { blocks, warnings };
+    }
+    const content = fs.readFileSync(filePath, 'utf-8');
+    // Find all blocks by START/END comments
+    const blockRegex = /<!-- START: ([^\s]+) \(([^)]+)\) -->([\s\S]*?)<!-- END: \1 -->/g;
+    let match;
+    while ((match = blockRegex.exec(content)) !== null) {
+        const id = match[1];
+        const type = match[2];
+        const blockContent = match[3].trim();
+        blocks[id] = blockContent;
+    }
+    // Now check for hierarchy: if a feature exists but its subcategory or category is missing, warn
+    const config = await loadConfig();
+    for (const cat of config.categories) {
+        if (!blocks[cat.id]) {
+            // Check if any subcategory or feature under this category exists
+            const subBlocks = cat.subcategories.filter((sub: any) => blocks[sub.id] || (sub.features && sub.features.some((f: any) => blocks[f.id])));
+            if (subBlocks.length > 0) {
+                warnings.push(`Category block missing: ${cat.id} (${cat.name}) but subcategory/feature blocks exist.`);
+            }
+            for (const sub of cat.subcategories) {
+                if (!blocks[sub.id]) {
+                    // Check if any feature under this subcategory exists
+                    const featBlocks = (sub.features || []).filter((f: any) => blocks[f.id]);
+                    if (featBlocks.length > 0) {
+                        warnings.push(`Subcategory block missing: ${sub.id} (${sub.name}) but feature blocks exist.`);
+                    }
+                }
+            }
+        }
+    }
+    return { blocks, warnings };
+}
