@@ -1,3 +1,6 @@
+<!-- 1 Frontend -->
+<!-- Category: Frontend -->
+
 # Copilot Instructions: Frontend Best Practices
 
 - Use modern frontend frameworks and libraries (e.g., React, Vue, Angular) for building user interfaces.

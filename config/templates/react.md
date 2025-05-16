@@ -1,3 +1,7 @@
+<!-- 1.1 React -->
+<!-- Category: Frontend -->
+<!-- Subcategory: React -->
+
 # Copilot Instructions: React Best Practices
 
 - Use React functional components and hooks for all new code.

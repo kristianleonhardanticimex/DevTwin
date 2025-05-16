@@ -1,3 +1,8 @@
+<!-- 1.1.1 JSX Support -->
+<!-- Category: Frontend -->
+<!-- Subcategory: React -->
+<!-- Feature: JSX Support -->
+
 # Copilot Instructions: Enable JSX Support
 
 - Use `.jsx` or `.tsx` file extensions for files containing JSX syntax.
