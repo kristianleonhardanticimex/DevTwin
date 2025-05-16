@@ -9,3 +9,5 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 **/.vscode-test.*
+# DO NOT ignore config/templates so tests and extension work
+# config/templates/**

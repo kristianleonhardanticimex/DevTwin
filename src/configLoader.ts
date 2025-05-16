@@ -52,11 +52,20 @@ export async function refreshConfig(): Promise<any> {
 
 // Helper to get template content from local config/templates folder
 async function getTemplateContent(type: 'category' | 'subcategory' | 'feature', id: string): Promise<string> {
-    const templatePath = path.join(__dirname, `../../config/templates/${id}.md`);
-    if (fs.existsSync(templatePath)) {
-        return fs.readFileSync(templatePath, 'utf-8');
+    // Try both the original workspace and the test workspace
+    const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri.fsPath || '';
+    const candidatePaths = [
+        path.join(workspaceRoot, 'config', 'templates', `${id}.md`),
+        path.join(process.cwd(), 'config', 'templates', `${id}.md`)
+    ];
+    for (const templatePath of candidatePaths) {
+        if (fs.existsSync(templatePath)) {
+            console.log('Using template:', templatePath);
+            return fs.readFileSync(templatePath, 'utf-8');
+        }
     }
-    return '';
+    console.warn('Template not found in any candidate path:', candidatePaths);
+    return `<!-- Missing template: ${id} (${type}) -->\n`;
 }
 
 export async function handleApplySelection(selection: { subcategories: string[]; features: string[] }) {
