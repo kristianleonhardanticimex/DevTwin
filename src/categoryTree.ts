@@ -84,6 +84,23 @@ export class DevTwinPanelProvider {
         html += `</div><vscode-button id='applySelection'>Apply Selection</vscode-button>`;
         html += `<script type='module'>
         const vscode = acquireVsCodeApi();
+        const config = ${JSON.stringify(config)};
+        // --- Feature/subcategory logic ---
+        function setFeatureStates(subId, checked) {
+            // Find subcategory config
+            const sub = config.categories.flatMap(c => c.subcategories).find(s => s.id === subId);
+            const defaultFeatures = (sub && sub.defaultFeatures) ? sub.defaultFeatures : [];
+            Array.from(document.querySelectorAll('.feature-checkbox[data-parent="' + subId + '"]')).forEach(function(fEl) {
+                fEl.disabled = !checked;
+                if (checked) {
+                    // Only check if in defaultFeatures
+                    fEl.checked = defaultFeatures.includes(fEl.getAttribute('data-feature'));
+                } else {
+                    fEl.checked = false;
+                }
+            });
+        }
+        // --- End feature/subcategory logic ---
         function filterItems() {
             var q = document.querySelector('.search').value.toLowerCase();
             document.querySelectorAll('.category-panel').forEach(function(catPanel) {
@@ -107,42 +124,18 @@ export class DevTwinPanelProvider {
             });
         }
         document.querySelector('.search').addEventListener('input', filterItems);
-        // Dependency prompt logic
-        function showRecommendationPrompt(recommendations) {
-            if (!recommendations || recommendations.length === 0) return;
-            const banner = document.getElementById('recommend-banner');
-            banner.innerHTML = '';
-            recommendations.forEach(function(rec) {
-                const msg = document.createElement('span');
-                msg.textContent = rec.reason || 'Recommended: ' + rec.id;
-                const btn = document.createElement('vscode-button');
-                btn.textContent = 'Enable ' + rec.id;
-                btn.onclick = function() {
-                    var el = document.querySelector('[data-subcategory="' + rec.id + '"]');
-                    if (!el) el = document.querySelector('[data-feature="' + rec.id + '"]');
-                    if (el) { el.checked = true; el.dispatchEvent(new Event('change')); }
-                    banner.style.display = 'none';
-                };
-                banner.appendChild(msg);
-                banner.appendChild(btn);
-            });
-            banner.style.display = 'flex';
-        }
-        document.querySelectorAll('.subcategory-checkbox, .feature-checkbox').forEach(function(el) {
+        // Remove dependency prompt logic for subcategory selection
+        document.querySelectorAll('.subcategory-checkbox').forEach(function(el) {
             el.addEventListener('change', function() {
-                if (this.checked) {
-                    const recs = JSON.parse(decodeURIComponent(this.getAttribute('data-recommend')));
-                    if (recs && recs.length > 0) showRecommendationPrompt(recs);
-                }
-                if (el.classList.contains('subcategory-checkbox')) {
-                    var subId = this.getAttribute('data-subcategory');
-                    var checked = this.checked;
-                    document.querySelectorAll(".feature-checkbox[data-parent='" + subId + "']").forEach(function(fEl) {
-                        fEl.disabled = !checked;
-                        if (!checked) fEl.checked = false;
-                    });
-                }
+                var subId = this.getAttribute('data-subcategory');
+                var checked = this.checked;
+                setFeatureStates(subId, checked);
             });
+        });
+        // On load, set initial feature states
+        document.querySelectorAll('.subcategory-checkbox').forEach(function(el) {
+            var subId = el.getAttribute('data-subcategory');
+            setFeatureStates(subId, el.checked);
         });
         document.getElementById('applySelection').addEventListener('click', function() {
             var selected = { subcategories: [], features: [] };

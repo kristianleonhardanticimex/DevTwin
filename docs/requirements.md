@@ -21,9 +21,9 @@ DevTwin enables developers to build `.github/copilot-instructions.md` files by s
 ### Behavioral Logic
 - **Selection & Dependency Logic**
   - Features are only selectable if their parent subcategory is selected.
-  - Deselecting a subcategory automatically deselects all its features.
-  - A subcategory can define default-selected features.
-  - When a subcategory is selected, all its default features are automatically selected. Users can manually deselect any feature afterward.
+  - Deselecting a subcategory automatically deselects all its features and disables (grays out) them.
+  - When a subcategory is selected, all its default features (as defined in the config JSON) are automatically selected and enabled. All features are enabled, but only the defaults are checked. Users can manually check/uncheck features after that.
+  - Deselecting a subcategory disables and unchecks all its features.
   - Dependencies can exist between subcategories and features (recommendations only). If a selected item has a dependency, a non-blocking prompt is shown. Deselecting an item does not auto-deselect its dependencies.
 
 - **User Interface Behavior**
