@@ -50,9 +50,25 @@ export async function refreshConfig(): Promise<any> {
     }
 }
 
-// Helper to get template content from local config/templates folder
+// Helper to get template content from GitHub (cloud-first)
 async function getTemplateContent(type: 'category' | 'subcategory' | 'feature', id: string): Promise<string> {
-    // Try both the original workspace and the test workspace
+    const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/kristianleonhardanticimex/DevTwin/main/config/templates/';
+    const url = `${GITHUB_RAW_BASE}${id}.md`;
+    try {
+        const res = await fetch(url);
+        if (res.ok) {
+            let content = await res.text();
+            // Remove any START/END block comments and verbose headers
+            content = content.replace(/<!-- START:[\s\S]*?-->/g, '')
+                             .replace(/<!-- END:[\s\S]*?-->/g, '')
+                             .replace(/<!--([\s\S]*?)-->/g, '')
+                             .replace(/^\s+|\s+$/g, '');
+            return content + '\n';
+        }
+    } catch (err) {
+        console.warn('Failed to fetch template from GitHub:', url, err);
+    }
+    // Fallback to local if GitHub fetch fails
     const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri.fsPath || '';
     const candidatePaths = [
         path.join(workspaceRoot, 'config', 'templates', `${id}.md`),
@@ -61,7 +77,6 @@ async function getTemplateContent(type: 'category' | 'subcategory' | 'feature', 
     for (const templatePath of candidatePaths) {
         if (fs.existsSync(templatePath)) {
             let content = fs.readFileSync(templatePath, 'utf-8');
-            // Remove any START/END block comments and verbose headers
             content = content.replace(/<!-- START:[\s\S]*?-->/g, '')
                              .replace(/<!-- END:[\s\S]*?-->/g, '')
                              .replace(/<!--([\s\S]*?)-->/g, '')
@@ -69,7 +84,7 @@ async function getTemplateContent(type: 'category' | 'subcategory' | 'feature', 
             return content + '\n';
         }
     }
-    console.warn('Template not found in any candidate path:', candidatePaths);
+    console.warn('Template not found in GitHub or any candidate path:', url, candidatePaths);
     return `<!-- Missing template: ${id} (${type}) -->\n`;
 }
 
