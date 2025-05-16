@@ -40,26 +40,41 @@ export class DevTwinPanelProvider {
         <script type="module" src="https://unpkg.com/@vscode/webview-ui-toolkit@1.0.0/dist/toolkit.min.js"></script>
         <style>
         body { font-family: var(--vscode-font-family); color: var(--vscode-foreground); background: var(--vscode-editor-background); margin: 16px; box-sizing: border-box; }
+        #header { margin-bottom: 8px; }
+        #header h1 { font-size: 1.6em; margin: 0 0 4px 0; font-weight: 600; }
+        #header p { color: var(--vscode-descriptionForeground); margin: 0 0 18px 0; font-size: 1.05em; }
+        .search { width: calc(100% - 0px); margin-bottom: 18px; }
         #content { margin: 0 8px 0 8px; }
-        .section { border-bottom: 1px solid var(--vscode-settings-dropdownBorder); padding-bottom: 0.5em; margin-bottom: 0.5em; }
-        .category { margin-top: 1.5em; font-weight: 600; color: var(--vscode-settings-headerForeground); }
-        .subcategory { margin-left: 1.5em; margin-top: 0.5em; }
-        .feature { margin-left: 3em; margin-top: 0.2em; }
-        .info { cursor: help; color: var(--vscode-descriptionForeground); margin-left: 0.3em; }
-        .vscode-button { margin: 1.5em 0 1em 0; }
+        .category-panel { background: var(--vscode-editorWidget-background, #23272e); border-radius: 8px; padding: 18px 18px 12px 18px; margin-bottom: 24px; box-shadow: 0 1px 4px 0 rgba(0,0,0,0.04); }
+        .category-title { font-size: 1.15em; font-weight: 600; margin-bottom: 2px; }
+        .category-desc { color: var(--vscode-descriptionForeground); font-size: 1em; margin-bottom: 12px; }
+        .subcategory { margin-left: 0.5em; margin-bottom: 10px; }
+        .subcategory-title { font-weight: 500; }
+        .subcategory-desc { color: var(--vscode-descriptionForeground); font-size: 0.98em; margin-bottom: 6px; margin-left: 1.5em; }
+        .feature { margin-left: 2em; margin-bottom: 6px; display: flex; align-items: center; }
+        .feature-desc { color: var(--vscode-descriptionForeground); font-size: 0.97em; margin-left: 0.5em; }
+        .vscode-button { margin: 32px 0 0 0; }
         .recommend-banner { background: var(--vscode-editorInfo-background); color: var(--vscode-editorInfo-foreground); border-left: 3px solid var(--vscode-editorInfo-border); padding: 8px 12px; margin: 12px 0; border-radius: 4px; display: flex; align-items: center; gap: 1em; }
         </style>
+        <div id='header'>
+          <h1>DevTwin Instruction Builder</h1>
+          <p>Build your <b>.github/copilot-instructions.md</b> by selecting categories, subcategories, and features that define how GitHub Copilot (or other AI assistants) should behave. Choose your preferred coding style, tools, and practices. Use the search bar to quickly filter options. Click <b>Apply Selection</b> to generate or update your instructions file.</p>
+        </div>
         <vscode-text-field class='search' placeholder='Search categories, subcategories, features...' onchange='filterItems()'></vscode-text-field>
         <div id='recommend-banner' style='display:none'></div>
         <div id='content'>
         `;
         for (const cat of config.categories) {
-            html += `<div class='category section'><span>${cat.name}</span> <span class='info' title='${cat.description || ''}'>ℹ️</span>`;
+            html += `<div class='category-panel'>`;
+            html += `<div class='category-title'>${cat.name}</div>`;
+            if (cat.description) { html += `<div class='category-desc'>${cat.description}</div>`; }
             for (const sub of cat.subcategories) {
-                html += `<div class='subcategory'><vscode-checkbox class='subcategory-checkbox' data-subcategory='${sub.id}' data-recommend='${encodeURIComponent(JSON.stringify(sub.recommendations || []))}'>${sub.name}</vscode-checkbox> <span class='info' title='${sub.description || ''}'>ℹ️</span>`;
+                html += `<div class='subcategory'>`;
+                html += `<vscode-checkbox class='subcategory-checkbox subcategory-title' data-subcategory='${sub.id}' data-recommend='${encodeURIComponent(JSON.stringify(sub.recommendations || []))}'>${sub.name}</vscode-checkbox>`;
+                if (sub.description) { html += `<div class='subcategory-desc'>${sub.description}</div>`; }
                 if (sub.features && sub.features.length > 0) {
                     for (const feat of sub.features) {
-                        html += `<div class='feature'><vscode-checkbox class='feature-checkbox' data-feature='${feat.id}' data-parent='${sub.id}' data-recommend='${encodeURIComponent(JSON.stringify(feat.recommendations || []))}'>${feat.name}</vscode-checkbox> <span class='info' title='${feat.description || ''}'>ℹ️</span></div>`;
+                        html += `<div class='feature'><vscode-checkbox class='feature-checkbox' data-feature='${feat.id}' data-parent='${sub.id}' data-recommend='${encodeURIComponent(JSON.stringify(feat.recommendations || []))}'></vscode-checkbox> <span class='feature-desc'><b>${feat.name}</b> - ${feat.description || ''}</span></div>`;
                     }
                 }
                 html += `</div>`;
@@ -71,11 +86,11 @@ export class DevTwinPanelProvider {
         const vscode = acquireVsCodeApi();
         function filterItems() {
             var q = document.querySelector('.search').value.toLowerCase();
-            document.querySelectorAll('.category').forEach(function(cat) {
-                var catText = cat.textContent.toLowerCase();
+            document.querySelectorAll('.category-panel').forEach(function(catPanel) {
+                var catText = catPanel.textContent.toLowerCase();
                 var catMatch = catText.includes(q);
                 var anySubMatch = false;
-                cat.querySelectorAll('.subcategory').forEach(function(sub) {
+                catPanel.querySelectorAll('.subcategory').forEach(function(sub) {
                     var subText = sub.textContent.toLowerCase();
                     var subMatch = subText.includes(q);
                     var anyFeatMatch = false;
@@ -88,7 +103,7 @@ export class DevTwinPanelProvider {
                     sub.style.display = (subMatch || catMatch || anyFeatMatch) ? '' : 'none';
                     if (subMatch || anyFeatMatch) anySubMatch = true;
                 });
-                cat.style.display = (catMatch || anySubMatch) ? '' : 'none';
+                catPanel.style.display = (catMatch || anySubMatch) ? '' : 'none';
             });
         }
         document.querySelector('.search').addEventListener('input', filterItems);
@@ -103,7 +118,6 @@ export class DevTwinPanelProvider {
                 const btn = document.createElement('vscode-button');
                 btn.textContent = 'Enable ' + rec.id;
                 btn.onclick = function() {
-                    // Try to check the recommended item (feature or subcategory)
                     var el = document.querySelector('[data-subcategory="' + rec.id + '"]');
                     if (!el) el = document.querySelector('[data-feature="' + rec.id + '"]');
                     if (el) { el.checked = true; el.dispatchEvent(new Event('change')); }
