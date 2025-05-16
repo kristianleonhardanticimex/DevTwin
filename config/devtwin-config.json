@@ -1,27 +1,27 @@
 {
   "categories": [
     {
-      "id": "frontend",
+      "id": "1-frontend",
       "name": "Frontend",
       "description": "Frontend frameworks and tools",
       "subcategories": [
         {
-          "id": "react",
+          "id": "1-1-react",
           "name": "React",
           "description": "Configuration for React apps",
-          "defaultFeatures": ["jsx_support"],
+          "defaultFeatures": ["1-1-1-jsx_support"],
           "recommendations": [
-            { "id": "use_vitest", "reason": "Recommended for testing React apps" }
+            { "id": "1-1-2-use_vitest", "reason": "Recommended for testing React apps" }
           ],
           "features": [
             {
-              "id": "jsx_support",
+              "id": "1-1-1-jsx_support",
               "name": "JSX Support",
               "description": "Enable JSX syntax support in your project.",
               "recommendations": []
             },
             {
-              "id": "use_vitest",
+              "id": "1-1-2-use_vitest",
               "name": "Use Vitest",
               "description": "Use Vitest to run fast unit tests and enable React component testing.",
               "recommendations": []

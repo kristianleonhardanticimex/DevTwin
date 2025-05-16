@@ -60,8 +60,13 @@ async function getTemplateContent(type: 'category' | 'subcategory' | 'feature', 
     ];
     for (const templatePath of candidatePaths) {
         if (fs.existsSync(templatePath)) {
-            console.log('Using template:', templatePath);
-            return fs.readFileSync(templatePath, 'utf-8');
+            let content = fs.readFileSync(templatePath, 'utf-8');
+            // Remove any START/END block comments and verbose headers
+            content = content.replace(/<!-- START:[\s\S]*?-->/g, '')
+                             .replace(/<!-- END:[\s\S]*?-->/g, '')
+                             .replace(/<!--([\s\S]*?)-->/g, '')
+                             .replace(/^\s+|\s+$/g, '');
+            return content + '\n';
         }
     }
     console.warn('Template not found in any candidate path:', candidatePaths);
@@ -90,11 +95,14 @@ export async function handleApplySelection(selection: { subcategories: string[];
     // Concatenate templates in order: Category > Subcategory > Feature
     let output = '';
     for (const catId of selectedCategoryIds) {
-        output += await getTemplateContent('category', catId);
+        const catContent = await getTemplateContent('category', catId);
+        output += `<!-- START: ${catId} (Category) -->\n` + catContent + `\n<!-- END: ${catId} -->\n`;
         for (const sub of selectedSubcats.filter(s => s.category.id === catId)) {
-            output += await getTemplateContent('subcategory', sub.id);
+            const subContent = await getTemplateContent('subcategory', sub.id);
+            output += `<!-- START: ${sub.id} (Subcategory: ${sub.name}) -->\n` + subContent + `\n<!-- END: ${sub.id} -->\n`;
             for (const feat of selectedFeatures.filter(f => f.subcategory.id === sub.id)) {
-                output += await getTemplateContent('feature', feat.id);
+                const featContent = await getTemplateContent('feature', feat.id);
+                output += `<!-- START: ${feat.id} (Feature: ${feat.name}) -->\n` + featContent + `\n<!-- END: ${feat.id} -->\n`;
             }
         }
     }
