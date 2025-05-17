@@ -29,6 +29,28 @@
           ]
         }
       ]
+    },
+    {
+      "id": "2-git",
+      "name": "Git & Version Control",
+      "description": "Best practices for using Git, including commit message standards and workflows.",
+      "subcategories": [
+        {
+          "id": "2-1-commit-messages",
+          "name": "Commit Message Standards",
+          "description": "Enforce a conventional commit message style for clarity and automation.",
+          "defaultFeatures": ["2-1-1-conventional-commits"],
+          "recommendations": [],
+          "features": [
+            {
+              "id": "2-1-1-conventional-commits",
+              "name": "Conventional Commits",
+              "description": "Use the Conventional Commits standard for all commit messages (e.g., feat:, fix:, docs:, etc.).",
+              "recommendations": []
+            }
+          ]
+        }
+      ]
     }
   ]
 }
