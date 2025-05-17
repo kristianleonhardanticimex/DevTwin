@@ -79,6 +79,155 @@
           ]
         }
       ]
+    },
+    {
+      "id": "3-backend-csharp",
+      "name": "Backend (C#/.NET)",
+      "description": ".NET backend development best practices, project structure, and testing.",
+      "template": "3-backend-csharp",
+      "subcategories": [
+        {
+          "id": "3-1-project-structure",
+          "name": "Project Structure",
+          "description": "Recommended folder and solution structure for scalable .NET backends.",
+          "template": "3-1-project-structure",
+          "defaultFeatures": ["3-1-1-clean-architecture"],
+          "recommendations": [],
+          "features": [
+            {
+              "id": "3-1-1-clean-architecture",
+              "name": "Clean Architecture",
+              "description": "Organize code using Clean Architecture principles (Domain, Application, Infrastructure, API).",
+              "template": "3-1-1-clean-architecture",
+              "recommendations": []
+            },
+            {
+              "id": "3-1-2-feature-folders",
+              "name": "Feature Folders",
+              "description": "Group related files by feature for maintainability.",
+              "template": "3-1-2-feature-folders",
+              "recommendations": []
+            }
+          ]
+        },
+        {
+          "id": "3-2-dependency-injection",
+          "name": "Dependency Injection",
+          "description": "Use built-in DI for services, repositories, and configuration.",
+          "template": "3-2-dependency-injection",
+          "defaultFeatures": ["3-2-1-use-built-in-di"],
+          "recommendations": [],
+          "features": [
+            {
+              "id": "3-2-1-use-built-in-di",
+              "name": "Use Built-in DI",
+              "description": "Register and inject dependencies using Microsoft.Extensions.DependencyInjection.",
+              "template": "3-2-1-use-built-in-di",
+              "recommendations": []
+            },
+            {
+              "id": "3-2-2-service-lifetimes",
+              "name": "Service Lifetimes",
+              "description": "Choose correct lifetimes: Singleton, Scoped, Transient.",
+              "template": "3-2-2-service-lifetimes",
+              "recommendations": []
+            }
+          ]
+        },
+        {
+          "id": "3-3-configuration",
+          "name": "Configuration & Secrets",
+          "description": "Best practices for appsettings, user secrets, and environment variables.",
+          "template": "3-3-configuration",
+          "defaultFeatures": ["3-3-1-appsettings","3-3-2-user-secrets"],
+          "recommendations": [],
+          "features": [
+            {
+              "id": "3-3-1-appsettings",
+              "name": "appsettings.json",
+              "description": "Store configuration in appsettings.json and use strongly-typed options.",
+              "template": "3-3-1-appsettings",
+              "recommendations": []
+            },
+            {
+              "id": "3-3-2-user-secrets",
+              "name": "User Secrets",
+              "description": "Use dotnet user-secrets for local development secrets.",
+              "template": "3-3-2-user-secrets",
+              "recommendations": []
+            },
+            {
+              "id": "3-3-3-env-vars",
+              "name": "Environment Variables",
+              "description": "Override config with environment variables for cloud-native apps.",
+              "template": "3-3-3-env-vars",
+              "recommendations": []
+            }
+          ]
+        },
+        {
+          "id": "3-4-logging",
+          "name": "Logging & Monitoring",
+          "description": "Structured logging, telemetry, and health checks.",
+          "template": "3-4-logging",
+          "defaultFeatures": ["3-4-1-serilog","3-4-2-health-checks"],
+          "recommendations": [],
+          "features": [
+            {
+              "id": "3-4-1-serilog",
+              "name": "Serilog",
+              "description": "Use Serilog for structured logging and enrich logs with context.",
+              "template": "3-4-1-serilog",
+              "recommendations": []
+            },
+            {
+              "id": "3-4-2-health-checks",
+              "name": "Health Checks",
+              "description": "Implement ASP.NET Core health checks for readiness/liveness.",
+              "template": "3-4-2-health-checks",
+              "recommendations": []
+            },
+            {
+              "id": "3-4-3-app-insights",
+              "name": "Application Insights",
+              "description": "Integrate Azure Application Insights for distributed tracing and monitoring.",
+              "template": "3-4-3-app-insights",
+              "recommendations": []
+            }
+          ]
+        },
+        {
+          "id": "3-5-unit-testing",
+          "name": "Unit Testing",
+          "description": "Test business logic and controllers using best-practice frameworks.",
+          "template": "3-5-unit-testing",
+          "defaultFeatures": ["3-5-1-xunit"],
+          "recommendations": [],
+          "features": [
+            {
+              "id": "3-5-1-xunit",
+              "name": "xUnit",
+              "description": "Use xUnit for unit testing (recommended by Microsoft).",
+              "template": "3-5-1-xunit",
+              "recommendations": []
+            },
+            {
+              "id": "3-5-2-nunit",
+              "name": "NUnit",
+              "description": "Use NUnit for unit testing.",
+              "template": "3-5-2-nunit",
+              "recommendations": []
+            },
+            {
+              "id": "3-5-3-mstest",
+              "name": "MSTest",
+              "description": "Use MSTest for unit testing.",
+              "template": "3-5-3-mstest",
+              "recommendations": []
+            }
+          ]
+        }
+      ]
     }
   ]
 }
