@@ -40,10 +40,10 @@ export class DevTwinPanelProvider {
         <script type="module" src="https://unpkg.com/@vscode/webview-ui-toolkit@1.0.0/dist/toolkit.min.js"></script>
         <style>
         body { font-family: var(--vscode-font-family); color: var(--vscode-foreground); background: var(--vscode-editor-background); margin: 16px; box-sizing: border-box; }
-        #header { margin-bottom: 0; max-width: 700px; margin-left: auto; margin-right: auto; }
+        #header { margin-bottom: 0; width: 100%; max-width: 700px; margin-left: 0; margin-right: 0; padding: 0; }
         #header h1 { font-size: 1.6em; margin: 0; font-weight: 600; }
-        #header p { color: var(--vscode-descriptionForeground); margin: 0; font-size: 1.05em; }
-        .search-container { width: 100%; max-width: 700px; margin: 0 auto 0 auto; position: relative; display: flex; }
+        #header p { color: var(--vscode-descriptionForeground); margin: 16px 0 0 0; font-size: 1.05em; }
+        .search-container { width: 100%; max-width: 700px; margin: 24px 0 0 0; position: relative; display: flex; }
         .search { flex: 1 1 auto; width: 100%; min-width: 0; }
         .clear-icon {
           position: absolute;
@@ -59,7 +59,7 @@ export class DevTwinPanelProvider {
           padding: 0 4px;
           line-height: 1;
         }
-        #content { margin: 0 auto; max-width: 700px; }
+        #content { width: 100%; max-width: 700px; margin: 0; }
         .category-panel {
           background: linear-gradient(135deg, var(--vscode-editorWidget-background, #23272e) 90%, var(--vscode-editor-background, #1e2024) 100%);
           border-radius: 8px;
@@ -68,8 +68,7 @@ export class DevTwinPanelProvider {
           box-shadow: 0 1px 4px 0 rgba(0,0,0,0.07);
           width: 100%;
           max-width: 700px;
-          margin-left: auto;
-          margin-right: auto;
+          margin: 24px 0 0 0;
         }
         .category-header { display: none; }
         .category-title { font-size: 1.15em; font-weight: 600; flex: 1; }
@@ -84,7 +83,7 @@ export class DevTwinPanelProvider {
         .feature { margin-left: 2em; margin-bottom: 6px; display: flex; align-items: center; }
         .feature-desc { color: var(--vscode-descriptionForeground); font-size: 0.97em; margin-left: 0.5em; }
         .vscode-button {
-          margin: 24px 0 0 0;
+          margin: 32px 0 0 0;
           display: block;
           max-width: 700px;
           width: 100%;
