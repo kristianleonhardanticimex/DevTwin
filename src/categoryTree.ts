@@ -83,7 +83,14 @@ export class DevTwinPanelProvider {
         .subcategory-desc { color: var(--vscode-descriptionForeground); font-size: 0.98em; margin-bottom: 6px; margin-left: 1.5em; }
         .feature { margin-left: 2em; margin-bottom: 6px; display: flex; align-items: center; }
         .feature-desc { color: var(--vscode-descriptionForeground); font-size: 0.97em; margin-left: 0.5em; }
-        .vscode-button { margin: 32px 0 0 0; }
+        .vscode-button {
+          margin: 32px 0 0 0;
+          display: block;
+          max-width: 700px;
+          width: 100%;
+          margin-left: auto;
+          margin-right: auto;
+        }
         .recommend-banner { background: var(--vscode-editorInfo-background); color: var(--vscode-editorInfo-foreground); border-left: 3px solid var(--vscode-editorInfo-border); padding: 8px 12px; margin: 12px 0; border-radius: 4px; display: flex; align-items: center; gap: 1em; }
         </style>
         <div id='header'>
