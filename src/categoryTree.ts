@@ -45,20 +45,6 @@ export class DevTwinPanelProvider {
         #header p { color: var(--vscode-descriptionForeground); margin: 16px 0 0 0; font-size: 1.05em; }
         .search-container { width: 100%; max-width: 700px; margin: 24px 0 0 0; position: relative; display: flex; }
         .search { flex: 1 1 auto; width: 100%; min-width: 0; }
-        .clear-icon {
-          position: absolute;
-          right: 14px;
-          top: 50%;
-          transform: translateY(-50%);
-          font-size: 1.3em;
-          color: var(--vscode-descriptionForeground);
-          background: none;
-          border: none;
-          cursor: pointer;
-          z-index: 2;
-          padding: 0 4px;
-          line-height: 1;
-        }
         #content { width: 100%; max-width: 700px; margin: 0; }
         .category-panel {
           background: linear-gradient(135deg, var(--vscode-editorWidget-background, #23272e) 90%, var(--vscode-editor-background, #1e2024) 100%);
@@ -97,7 +83,6 @@ export class DevTwinPanelProvider {
         </div>
         <div class='search-container'>
           <vscode-text-field class='search' placeholder='Search categories, subcategories, features...' onchange='filterItems()'></vscode-text-field>
-          <button class='clear-icon' title='Clear search' tabindex='0' aria-label='Clear search' style='display:none;'>&times;</button>
         </div>
         <div id='recommend-banner' style='display:none'></div>
         <div id='content'>
@@ -159,29 +144,8 @@ export class DevTwinPanelProvider {
                 });
                 catPanel.style.display = (catMatch || anySubMatch) ? '' : 'none';
             });
-            // Show/hide clear icon
-            const clearBtn = document.querySelector('.clear-icon');
-            if (q.length > 0) {
-                clearBtn.style.display = '';
-            } else {
-                clearBtn.style.display = 'none';
-            }
         }
         document.querySelector('.search').addEventListener('input', filterItems);
-        // Clear icon logic
-        document.querySelector('.clear-icon').addEventListener('click', function() {
-            const search = document.querySelector('.search');
-            search.value = '';
-            filterItems();
-            search.focus();
-        });
-        // Keyboard accessibility for clear button
-        document.querySelector('.clear-icon').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                this.click();
-            }
-        });
         // Remove dependency prompt logic for subcategory selection
         document.querySelectorAll('.subcategory-checkbox').forEach(function(el) {
             el.addEventListener('change', function() {
