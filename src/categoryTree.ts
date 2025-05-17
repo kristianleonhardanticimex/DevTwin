@@ -43,9 +43,31 @@ export class DevTwinPanelProvider {
         #header { margin-bottom: 8px; }
         #header h1 { font-size: 1.6em; margin: 0 0 4px 0; font-weight: 600; }
         #header p { color: var(--vscode-descriptionForeground); margin: 0 0 18px 0; font-size: 1.05em; }
-        .search { width: 100%; max-width: 700px; margin-bottom: 18px; }
+        .search-container { width: 100%; max-width: 700px; margin: 0 auto 18px auto; position: relative; display: flex; }
+        .search { flex: 1 1 auto; width: 100%; min-width: 0; }
+        .clear-icon {
+          position: absolute;
+          right: 14px;
+          top: 50%;
+          transform: translateY(-50%);
+          font-size: 1.3em;
+          color: var(--vscode-descriptionForeground);
+          background: none;
+          border: none;
+          cursor: pointer;
+          z-index: 2;
+          padding: 0 4px;
+          line-height: 1;
+        }
         #content { margin: 0 auto; max-width: 700px; }
-        .category-panel { background: var(--vscode-panel-background, #1e2024); border-radius: 8px; padding: 18px 18px 12px 18px; margin-bottom: 24px; box-shadow: 0 1px 4px 0 rgba(0,0,0,0.07); }
+        .category-panel {
+          background: linear-gradient(135deg, var(--vscode-editorWidget-background, #23272e) 90%, var(--vscode-editor-background, #1e2024) 100%);
+          border-radius: 8px;
+          padding: 18px 18px 12px 18px;
+          margin-bottom: 24px;
+          box-shadow: 0 1px 4px 0 rgba(0,0,0,0.07);
+          width: 100%;
+        }
         .category-header { display: none; }
         .category-title { font-size: 1.15em; font-weight: 600; flex: 1; }
         .category-toggle { font-size: 1.2em; margin-right: 10px; transition: transform 0.2s; }
@@ -65,7 +87,10 @@ export class DevTwinPanelProvider {
           <h1>DevTwin Instruction Builder</h1>
           <p>Build your <b>.github/copilot-instructions.md</b> by selecting categories, subcategories, and features that define how GitHub Copilot (or other AI assistants) should behave. Choose your preferred coding style, tools, and practices. Use the search bar to quickly filter options. Click <b>Apply Selection</b> to generate or update your instructions file.</p>
         </div>
-        <vscode-text-field class='search' placeholder='Search categories, subcategories, features...' onchange='filterItems()'></vscode-text-field>
+        <div class='search-container'>
+          <vscode-text-field class='search' placeholder='Search categories, subcategories, features...' onchange='filterItems()'></vscode-text-field>
+          <button class='clear-icon' title='Clear search' tabindex='0' aria-label='Clear search' style='display:none;'>&times;</button>
+        </div>
         <div id='recommend-banner' style='display:none'></div>
         <div id='content'>
         `;
@@ -126,8 +151,22 @@ export class DevTwinPanelProvider {
                 });
                 catPanel.style.display = (catMatch || anySubMatch) ? '' : 'none';
             });
+            // Show/hide clear icon
+            const clearBtn = document.querySelector('.clear-icon');
+            if (q.length > 0) {
+                clearBtn.style.display = '';
+            } else {
+                clearBtn.style.display = 'none';
+            }
         }
         document.querySelector('.search').addEventListener('input', filterItems);
+        // Clear icon logic
+        document.querySelector('.clear-icon').addEventListener('click', function() {
+            const search = document.querySelector('.search');
+            search.value = '';
+            filterItems();
+            search.focus();
+        });
         // Remove dependency prompt logic for subcategory selection
         document.querySelectorAll('.subcategory-checkbox').forEach(function(el) {
             el.addEventListener('change', function() {
@@ -151,6 +190,8 @@ export class DevTwinPanelProvider {
             });
             vscode.postMessage({ command: 'applySelection', data: selected });
         });
+        // On load, ensure clear icon is correct
+        filterItems();
         </script>`;
         this.panel.webview.html = html;
     }
