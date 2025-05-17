@@ -144,7 +144,7 @@ export class DevTwinPanelProvider {
         <div id='container'>
           <div id='header'>
             <h1>DevTwin Instruction Builder</h1>
-            <p>Build your <b>.github/copilot-instructions.md</b> by selecting categories, subcategories, feature groups, and features that define how GitHub Copilot (or other AI assistants) should behave. Choose your preferred coding style, tools, and practices. Use the search bar to quickly filter options. Click <b>Apply Selection</b> to generate or update your instructions file.</p>
+            <p><b>DevTwin</b> helps you configure <b>GitHub Copilot</b> to mirror your preferred way of developing software. Define your <b>coding style</b>, <b>tools</b>, <b>architecture</b>, and <b>best practices</b> by selecting from structured categories, subcategories, and features. Use the search bar to quickly filter options and click <b>Apply Selection</b> to generate or update your <b>.github/copilot-instructions.md</b> file. With DevTwin, Copilot becomes a <b>digital twin</b> that writes code the way you do.</p>
           </div>
           <div class='search-container'>
             <vscode-text-field class='search' placeholder='Search categories, subcategories, feature groups, features...' onchange='filterItems()'></vscode-text-field>
@@ -161,7 +161,8 @@ export class DevTwinPanelProvider {
           for (const sub of cat.subcategories) {
             html += `<div class='subcategory'>`;
             html += `<div class='subcategory-header' style='display: flex; align-items: flex-start;'>`;
-            html += `<vscode-checkbox class='subcategory-checkbox' data-subcategory='${sub.id}' data-recommend='${encodeURIComponent(JSON.stringify(sub.recommendations || []))}'></vscode-checkbox>`;
+            const isChecked = (sub.defaultSelected === true || (Array.isArray(sub.defaultFeatures) && sub.defaultFeatures.length > 0)) ? 'checked' : '';
+            html += `<vscode-checkbox class='subcategory-checkbox' data-subcategory='${sub.id}' data-recommend='${encodeURIComponent(JSON.stringify(sub.recommendations || []))}' ${isChecked}></vscode-checkbox>`;
             html += `<div style='display: flex; flex-direction: column;'>`;
             html += `<span class='subcategory-title'>${sub.name}</span>`;
             if (sub.description) {
