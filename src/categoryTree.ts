@@ -76,7 +76,7 @@ export class DevTwinPanelProvider {
           max-width: 700px;
           margin: 24px 0 0 0;
         }
-        .category-header { display: none; }
+        .category-header { display: block; }
         .category-title { font-size: 1.15em; font-weight: 600; flex: 1; }
         .category-toggle { font-size: 1.2em; margin-right: 10px; transition: transform 0.2s; }
         .category-toggle.collapsed { transform: rotate(-90deg); }
@@ -109,6 +109,12 @@ export class DevTwinPanelProvider {
         `;
         for (const cat of config.categories) {
             html += `<div class='category-panel' data-category='${cat.id}'>`;
+            // Add category header (name and description)
+            html += `<div class='category-header'><span class='category-title'>${cat.name}</span>`;
+            if (cat.description) {
+                html += `<div class='category-desc'>${cat.description}</div>`;
+            }
+            html += `</div>`;
             html += `<div class='category-content' id='content-${cat.id}'>`;
             for (const sub of cat.subcategories) {
                 html += `<div class='subcategory'>`;
