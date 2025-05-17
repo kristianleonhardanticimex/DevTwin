@@ -39,14 +39,14 @@ export class DevTwinPanelProvider {
         <link rel="stylesheet" href="https://unpkg.com/@vscode/webview-ui-toolkit@1.0.0/dist/toolkit.min.css">
         <script type="module" src="https://unpkg.com/@vscode/webview-ui-toolkit@1.0.0/dist/toolkit.min.js"></script>
         <style>
-        body { font-family: var(--vscode-font-family); color: var(--vscode-foreground); background: #f4f6fa; margin: 16px; box-sizing: border-box; }
+        body { font-family: var(--vscode-font-family); color: var(--vscode-foreground); background: var(--vscode-editor-background); margin: 16px; box-sizing: border-box; }
         #header { margin-bottom: 8px; }
         #header h1 { font-size: 1.6em; margin: 0 0 4px 0; font-weight: 600; }
         #header p { color: var(--vscode-descriptionForeground); margin: 0 0 18px 0; font-size: 1.05em; }
         .search { width: 100%; max-width: 700px; margin-bottom: 18px; }
         #content { margin: 0 auto; max-width: 700px; }
-        .category-panel { background: #fff; border-radius: 8px; padding: 0 0 0 0; margin-bottom: 24px; box-shadow: 0 1px 4px 0 rgba(0,0,0,0.07); overflow: hidden; }
-        .category-header { display: flex; align-items: center; cursor: pointer; padding: 18px 18px 12px 18px; }
+        .category-panel { background: var(--vscode-sideBar-background, #23272e); border-radius: 8px; padding: 0 0 0 0; margin-bottom: 24px; box-shadow: 0 1px 4px 0 rgba(0,0,0,0.07); overflow: hidden; }
+        .category-header { display: flex; align-items: center; cursor: pointer; padding: 18px 18px 12px 18px; background: var(--vscode-editorWidget-background, #23272e); }
         .category-title { font-size: 1.15em; font-weight: 600; flex: 1; }
         .category-toggle { font-size: 1.2em; margin-right: 10px; transition: transform 0.2s; }
         .category-toggle.collapsed { transform: rotate(-90deg); }
