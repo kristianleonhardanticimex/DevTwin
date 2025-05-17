@@ -455,10 +455,12 @@
         {
           "id": "github-actions-mcp",
           "name": "GitHub Actions / MCP",
+          "description": "CI/CD workflows and automation with GitHub Actions and Model Context Protocol.",
           "featureGroups": [
             {
               "id": "workflow-design",
               "name": "Workflow",
+              "description": "Workflow design and reusable automation patterns for GitHub Actions.",
               "features": [
                 { "id": "workflow-file-layout", "name": "Workflow File Layout", "description": "Organize workflows for clarity and reuse." },
                 { "id": "reusable-workflows", "name": "Reusable Workflows", "description": "Share workflow logic across projects." },
@@ -471,10 +473,12 @@
         {
           "id": "azure-pipelines",
           "name": "Azure Pipelines",
+          "description": "Build, test, and deploy automation using Azure Pipelines.",
           "featureGroups": [
             {
               "id": "pipeline-features",
               "name": "Features",
+              "description": "Key features and best practices for Azure Pipelines.",
               "features": [
                 { "id": "multi-stage-pipelines", "name": "Multi-Stage Pipelines", "description": "Model complex workflows with multiple stages." },
                 { "id": "templates-variables", "name": "Templates and Variables", "description": "Reuse pipeline logic and manage configuration." },
@@ -487,10 +491,12 @@
         {
           "id": "docker",
           "name": "Docker",
+          "description": "Containerization and orchestration with Docker.",
           "featureGroups": [
             {
               "id": "docker-features",
               "name": "Features",
+              "description": "Essential Docker features and best practices.",
               "features": [
                 { "id": "multi-stage-builds", "name": "Multi-Stage Builds", "description": "Optimize Docker images with multi-stage builds." },
                 { "id": "docker-compose", "name": "Docker Compose", "description": "Define and run multi-container Docker apps." },
@@ -502,10 +508,12 @@
         {
           "id": "kubernetes",
           "name": "Kubernetes",
+          "description": "Container orchestration and deployment with Kubernetes.",
           "featureGroups": [
             {
               "id": "kubernetes-features",
               "name": "Features",
+              "description": "Key Kubernetes features and configuration options.",
               "features": [
                 { "id": "helm-charts", "name": "Helm Charts", "description": "Package and deploy Kubernetes applications." },
                 { "id": "manifests", "name": "Manifests", "description": "Declarative configuration for Kubernetes resources." },
@@ -580,6 +588,7 @@
             {
               "id": "react-component-patterns",
               "name": "Component Patterns",
+              "description": "Patterns for building and composing React components.",
               "features": [
                 { "id": "functional-components", "name": "Functional Components", "description": "Use function-based components for simplicity and performance." },
                 { "id": "component-composition", "name": "Component Composition", "description": "Build complex UIs by composing smaller components." }
@@ -588,6 +597,7 @@
             {
               "id": "react-state-data",
               "name": "State & Data",
+              "description": "State management and data handling in React.",
               "features": [
                 { "id": "hooks", "name": "Hooks", "description": "Manage state and side effects in React components." },
                 { "id": "context-api", "name": "Context API", "description": "Share state across the component tree." },
@@ -605,6 +615,7 @@
             {
               "id": "angular-structure",
               "name": "Structure",
+              "description": "Organizational patterns and structure for Angular apps.",
               "features": [
                 { "id": "ngmodules", "name": "NgModules", "description": "Organize Angular apps into cohesive blocks of functionality." },
                 { "id": "angular-cli", "name": "Angular CLI", "description": "Command-line tooling for Angular projects." }
@@ -613,6 +624,7 @@
             {
               "id": "angular-patterns",
               "name": "Patterns",
+              "description": "Design and reactive patterns for Angular development.",
               "features": [
                 { "id": "angular-di", "name": "Dependency Injection", "description": "Use Angular's DI system for modularity and testability." },
                 { "id": "rxjs-patterns", "name": "RxJS Patterns", "description": "Reactive programming with RxJS in Angular." }
@@ -628,6 +640,7 @@
             {
               "id": "vue-structure",
               "name": "Structure",
+              "description": "Component and state structure for Vue applications.",
               "features": [
                 { "id": "composition-api", "name": "Composition API", "description": "Modern API for organizing Vue component logic." },
                 { "id": "vuex", "name": "Vuex", "description": "State management for Vue applications." },
@@ -644,6 +657,7 @@
             {
               "id": "ui-testing-tools",
               "name": "Tools",
+              "description": "Popular tools for UI and component testing.",
               "features": [
                 { "id": "playwright", "name": "Playwright", "description": "End-to-end browser testing for any frontend." },
                 { "id": "testing-library", "name": "Testing Library (React, Angular)", "description": "User-centric component testing for React and Angular.", "dependencies": ["react", "angular"] },
@@ -662,10 +676,12 @@
         {
           "id": "security-practices",
           "name": "Security Practices",
+          "description": "Best practices and techniques for secure software development.",
           "featureGroups": [
             {
               "id": "security-practices-group",
               "name": "Practices",
+              "description": "Core security practices for application development.",
               "features": [
                 { "id": "owasp-top-10", "name": "OWASP Top 10", "description": "Address the most critical security risks to web applications." },
                 { "id": "secure-code-practices", "name": "Secure Code Practices", "description": "Write code that avoids common vulnerabilities." }
@@ -674,6 +690,7 @@
             {
               "id": "security-techniques",
               "name": "Techniques",
+              "description": "Techniques for authentication, authorization, and secure data handling.",
               "features": [
                 { "id": "input-validation", "name": "Input Validation / Output Encoding", "description": "Prevent injection attacks." },
                 { "id": "authentication", "name": "Authentication (JWT, OAuth2)", "description": "Securely authenticate users." },
@@ -694,10 +711,12 @@
         {
           "id": "general-principles",
           "name": "General",
+          "description": "Foundational principles for writing clean, maintainable, and effective code.",
           "featureGroups": [
             {
               "id": "general-principles-group",
               "name": "Principles",
+              "description": "Widely accepted software engineering principles.",
               "features": [
                 { "id": "boy-scout-rule", "name": "Boy Scout Rule", "description": "Always leave the codebase cleaner than you found it." },
                 { "id": "kiss", "name": "Keep It Simple, Stupid (KISS)", "description": "Prefer simple solutions." },
@@ -775,10 +794,12 @@
         {
           "id": "linters",
           "name": "Linters",
+          "description": "Tools for static code analysis and style enforcement.",
           "featureGroups": [
             {
               "id": "linters-group",
               "name": "Linters",
+              "description": "Popular linters for various programming languages.",
               "features": [
                 { "id": "eslint-tslint", "name": "ESLint / TSLint", "description": "Lint JavaScript and TypeScript code." },
                 { "id": "prettier", "name": "Prettier", "description": "Code formatter for consistent style." },
@@ -790,10 +811,12 @@
         {
           "id": "quality-tools",
           "name": "Quality Tools",
+          "description": "Tools for automated code quality checks and dependency management.",
           "featureGroups": [
             {
               "id": "quality-tools-group",
               "name": "Quality Tools",
+              "description": "Automated tools for code quality and dependency updates.",
               "features": [
                 { "id": "sonarqube", "name": "SonarQube", "description": "Continuous inspection of code quality." },
                 { "id": "dependabot", "name": "Dependabot", "description": "Automated dependency updates." },
