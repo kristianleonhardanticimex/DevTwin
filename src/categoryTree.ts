@@ -86,8 +86,20 @@ export class DevTwinPanelProvider {
         .subcategory { margin-left: 0.5em; margin-bottom: 10px; }
         .subcategory-title { font-weight: 500; }
         .subcategory-desc { color: var(--vscode-descriptionForeground); font-size: 0.98em; margin-bottom: 6px; margin-left: 1.5em; }
-        .feature { margin-left: 2em; margin-bottom: 6px; display: flex; align-items: flex-start; }
-        .feature-desc { color: var(--vscode-descriptionForeground); font-size: 0.97em; margin-left: 0.5em; }
+        .feature {
+          margin-left: 2em;
+          margin-bottom: 6px;
+          display: flex;
+          align-items: flex-start;
+        }
+        .feature-desc {
+          color: var(--vscode-descriptionForeground);
+          font-size: 0.97em;
+          margin-left: 0.5em;
+          display: block;
+          line-height: 1.6;
+          word-break: break-word;
+        }
         .vscode-button {
           margin: 32px 0 0 0;
           display: block;
