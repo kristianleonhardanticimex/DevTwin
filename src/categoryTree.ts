@@ -150,6 +150,11 @@ export class DevTwinPanelProvider {
           width: 100%;
           text-align: left;
         }
+        .info-icon {
+          margin-left: 8px;
+          cursor: pointer;
+          color: var(--vscode-descriptionForeground);
+        }
         </style>
         <div id='container'>
           <div id='header'>
@@ -179,6 +184,7 @@ export class DevTwinPanelProvider {
               html += `<div class='subcategory-desc'>${sub.description}</div>`;
             }
             html += `</div>`;
+            html += `<span class='info-icon' data-type='subcategory' data-id='${sub.id}' title='More info' style='margin-left:6px;cursor:pointer;'><i class='fa fa-info-circle'></i></span>`;
             html += `</div>`;
             if (sub.featureGroups && sub.featureGroups.length > 0) {
               for (const group of sub.featureGroups) {
@@ -195,11 +201,11 @@ export class DevTwinPanelProvider {
                     let tagsHtml = '';
                     if (feat.tags && Array.isArray(feat.tags)) {
                       for (const tag of feat.tags) {
-                        // Render only the Font Awesome wrench icon, no label text
                         tagsHtml += `<span class='feature-tag' style='background:${tag.color};color:#fff;border-radius:4px;padding:2px 7px;font-size:1.1em;margin-right:7px;vertical-align:middle;display:inline-flex;align-items:center;gap:4px;cursor:${tag.url ? 'pointer' : 'default'};' ${tag.url ? `onclick=\"window.open('${tag.url}','_blank')\"` : ''} title='This feature requires an external tool'><i class='fa fa-wrench'></i></span>`;
                       }
                     }
                     html += `<span class='feature-desc'>${tagsHtml}<b>${feat.name}</b>${feat.description ? ' - ' + feat.description : ''}</span>`;
+                    html += `<span class='info-icon' data-type='feature' data-id='${feat.id}' title='More info' style='margin-left:6px;cursor:pointer;'><i class='fa fa-info-circle'></i></span>`;
                     html += `</div>`;
                   }
                   html += `</div>`;
@@ -212,75 +218,115 @@ export class DevTwinPanelProvider {
           html += `</div>`;
         }
         html += `</div><vscode-button id='applySelection'>Apply Selection</vscode-button>`;
-        html += `<script type='module'>
-        const vscode = acquireVsCodeApi();
-        const config = ${JSON.stringify(config)};
-        // --- Feature/subcategory logic ---
-        function setFeatureStates(subId, checked) {
-            const sub = config.categories.flatMap(c => c.subcategories).find(s => s.id === subId);
-            const defaultFeatures = (sub && sub.defaultFeatures) ? sub.defaultFeatures : [];
-            Array.from(document.querySelectorAll('.feature-checkbox[data-parent="' + subId + '"]')).forEach(function(fEl) {
-                fEl.disabled = !checked;
-                if (checked) {
-                    fEl.checked = defaultFeatures.includes(fEl.getAttribute('data-feature'));
-                } else {
-                    fEl.checked = false;
+        html += `
+<div id='info-dialog' style='display:none;position:fixed;z-index:9999;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);align-items:center;justify-content:center;'>
+  <div id='info-dialog-content' style='background:#222;color:#fff;max-width:600px;width:90vw;min-width:320px;min-height:120px;padding:32px 28px 18px 28px;border-radius:10px;box-shadow:0 8px 32px #000a;position:absolute;top:20vh;left:calc(50vw - 300px);resize:both;overflow:auto;cursor:move;'>
+    <span id='info-dialog-close' style='position:absolute;top:12px;right:18px;font-size:1.5em;cursor:pointer;'><i class='fa fa-times'></i></span>
+    <div id='info-dialog-meta'></div>
+    <hr style='margin:18px 0 12px 0;border:0;border-top:1px solid #444;'>
+    <pre id='info-dialog-template' style='background:#181818;color:#fff;padding:14px 12px;border-radius:6px;overflow-x:auto;max-height:320px;'></pre>
+  </div>
+</div>
+`;
+        html += `<script>
+        (function() {
+          var config = ${JSON.stringify(config)};
+          function showInfoDialog(type, id) {
+            var meta = {};
+            var templateContent = '';
+            if (type === 'subcategory') {
+              for (var i=0; i<config.categories.length; ++i) {
+                var cat = config.categories[i];
+                for (var j=0; j<cat.subcategories.length; ++j) {
+                  var sub = cat.subcategories[j];
+                  if (sub.id === id) {
+                    meta = {
+                      title: sub.name,
+                      description: sub.longDescription || sub.description || '',
+                      docLink: sub.docLink || '',
+                      author: 'Kristian Leonhard'
+                    };
+                    templateContent = '';
+                  }
                 }
+              }
+            } else if (type === 'feature') {
+              for (var i=0; i<config.categories.length; ++i) {
+                var cat = config.categories[i];
+                for (var j=0; j<cat.subcategories.length; ++j) {
+                  var sub = cat.subcategories[j];
+                  if (!sub.featureGroups) continue;
+                  for (var k=0; k<sub.featureGroups.length; ++k) {
+                    var group = sub.featureGroups[k];
+                    if (!group.features) continue;
+                    for (var l=0; l<group.features.length; ++l) {
+                      var feat = group.features[l];
+                      if (feat.id === id) {
+                        meta = {
+                          title: feat.name,
+                          description: feat.longDescription || feat.description || '',
+                          docLink: feat.docLink || '',
+                          author: feat.author || 'Kristian Leonhard'
+                        };
+                        templateContent = feat.templateContent || '';
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            var metaHtml = "<div style='font-size:1.2em;font-weight:bold;'>" + (meta.title || '') + "</div>";
+            if (meta.description) metaHtml += "<div style='margin:8px 0 0 0;'>" + meta.description + "</div>";
+            if (meta.docLink) metaHtml += "<div style='margin:8px 0 0 0;'><a href='" + meta.docLink + "' target='_blank' style='color:#4af;text-decoration:underline;'>Documentation</a></div>";
+            if (meta.author) metaHtml += "<div style='margin:8px 0 0 0;font-size:0.98em;color:#aaa;'>Author: " + meta.author + "</div>";
+            document.getElementById('info-dialog-meta').innerHTML = metaHtml;
+            document.getElementById('info-dialog-template').textContent = templateContent;
+            document.getElementById('info-dialog').style.display = 'flex';
+            // Center dialog
+            var dialog = document.getElementById('info-dialog-content');
+            dialog.style.left = 'calc(50vw - ' + (dialog.offsetWidth/2) + 'px)';
+            dialog.style.top = '20vh';
+          }
+          // Moveable dialog logic
+          var drag = false, dragOffsetX = 0, dragOffsetY = 0;
+          var dialog = null;
+          document.addEventListener('mousedown', function(e) {
+            if (e.target && e.target.id === 'info-dialog-content') {
+              drag = true;
+              dialog = e.target;
+              dragOffsetX = e.clientX - dialog.offsetLeft;
+              dragOffsetY = e.clientY - dialog.offsetTop;
+              dialog.style.cursor = 'grabbing';
+            }
+          });
+          document.addEventListener('mousemove', function(e) {
+            if (drag && dialog) {
+              dialog.style.left = (e.clientX - dragOffsetX) + 'px';
+              dialog.style.top = (e.clientY - dragOffsetY) + 'px';
+            }
+          });
+          document.addEventListener('mouseup', function(e) {
+            if (drag && dialog) {
+              drag = false;
+              dialog.style.cursor = 'move';
+              dialog = null;
+            }
+          });
+          // End moveable logic
+          var infoIcons = document.querySelectorAll('.info-icon');
+          for (var i=0; i<infoIcons.length; ++i) {
+            infoIcons[i].addEventListener('click', function(e) {
+              e.stopPropagation();
+              showInfoDialog(this.getAttribute('data-type'), this.getAttribute('data-id'));
             });
-        }
-        // --- End feature/subcategory logic ---
-        function filterItems() {
-            var q = document.querySelector('.search').value.toLowerCase();
-            document.querySelectorAll('.category-panel').forEach(function(catPanel) {
-                var catText = catPanel.textContent.toLowerCase();
-                var catMatch = catText.includes(q);
-                var anySubMatch = false;
-                catPanel.querySelectorAll('.subcategory').forEach(function(sub) {
-                    var subText = sub.textContent.toLowerCase();
-                    var subMatch = subText.includes(q);
-                    var anyGroupMatch = false;
-                    sub.querySelectorAll('.feature-group').forEach(function(group) {
-                        var groupText = group.textContent.toLowerCase();
-                        var groupMatch = groupText.includes(q);
-                        var anyFeatMatch = false;
-                        group.querySelectorAll('.feature').forEach(function(feat) {
-                            var featText = feat.textContent.toLowerCase();
-                            var featMatch = featText.includes(q);
-                            feat.style.display = (featMatch || groupMatch || subMatch || catMatch) ? '' : 'none';
-                            if (featMatch) anyFeatMatch = true;
-                        });
-                        group.style.display = (groupMatch || subMatch || catMatch || anyFeatMatch) ? '' : 'none';
-                        if (groupMatch || anyFeatMatch) anyGroupMatch = true;
-                    });
-                    sub.style.display = (subMatch || catMatch || anyGroupMatch) ? '' : 'none';
-                    if (subMatch || anyGroupMatch) anySubMatch = true;
-                });
-                catPanel.style.display = (catMatch || anySubMatch) ? '' : 'none';
-            });
-        }
-        document.querySelector('.search').addEventListener('input', filterItems);
-        document.querySelectorAll('.subcategory-checkbox').forEach(function(el) {
-            el.addEventListener('change', function() {
-                var subId = this.getAttribute('data-subcategory');
-                var checked = this.checked;
-                setFeatureStates(subId, checked);
-            });
-        });
-        document.querySelectorAll('.subcategory-checkbox').forEach(function(el) {
-            var subId = el.getAttribute('data-subcategory');
-            setFeatureStates(subId, el.checked);
-        });
-        document.getElementById('applySelection').addEventListener('click', function() {
-            var selected = { subcategories: [], features: [] };
-            document.querySelectorAll('.subcategory-checkbox').forEach(function(subEl) {
-                if (subEl.checked) selected.subcategories.push(subEl.getAttribute('data-subcategory'));
-            });
-            document.querySelectorAll('.feature-checkbox').forEach(function(featEl) {
-                if (featEl.checked && !featEl.disabled) selected.features.push(featEl.getAttribute('data-feature'));
-            });
-            vscode.postMessage({ command: 'applySelection', data: selected });
-        });
-        filterItems();
+          }
+          document.getElementById('info-dialog-close').onclick = function() {
+            document.getElementById('info-dialog').style.display = 'none';
+          };
+          document.getElementById('info-dialog').onclick = function(e) {
+            if (e.target === this) this.style.display = 'none';
+          };
+        })();
         </script>`;
         this.panel.webview.html = html;
     }

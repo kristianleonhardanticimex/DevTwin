@@ -565,7 +565,16 @@
               "name": "Tools",
               "description": "Tools for integrating with MCP and developer portals.",
               "features": [
-                { "id": "github-mcp", "name": "GitHub MCP", "description": "Integrate with GitHub's Model Context Protocol.", "tags": [{ "label": "Tool", "color": "#d32f2f", "url": "https://github.com/github/github-mcp-server" }] },
+                {
+                  "id": "github-mcp",
+                  "name": "GitHub MCP",
+                  "description": "Integrate with GitHub's Model Context Protocol.",
+                  "longDescription": "GitHub MCP enables advanced AI-driven developer experiences by integrating with GitHub's Model Context Protocol. To utilize this feature, you must install and run the GitHub MCP Server extension in VS Code. This allows Copilot to provide context-aware instructions and workflows, unlocking richer, more personalized coding assistance.",
+                  "tags": [{ "label": "Tool", "color": "#d32f2f", "url": "https://github.com/github/github-mcp-server" }],
+                  "docLink": "https://github.com/github/github-mcp-server",
+                  "author": "Kristian Leonhard",
+                  "templateContent": "# GitHub MCP\n\nIntegrate with GitHub's Model Context Protocol.\n\n- Use MCP to provide context-aware Copilot instructions and workflows.\n- Enables advanced AI-driven developer experiences.\n\n**References:**\n- [GitHub MCP documentation](https://docs.github.com/en/copilot/model-context-protocol)\n- [GitHub MCP Server](https://github.com/github/github-mcp-server)"
+                },
                 { "id": "playwright-mcp", "name": "Playwright MCP", "description": "Integrate Playwright with MCP." },
                 { "id": "backstage", "name": "Backstage.io", "description": "Developer portal for managing software." },
                 { "id": "mkdocs-docusaurus", "name": "mkdocs / Docusaurus", "description": "Static site generators for documentation." }
