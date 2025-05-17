@@ -105,7 +105,7 @@ export class DevTwinPanelProvider {
           margin: 2px 0 12px 0;
         }
         .feature-group {
-          margin-left: 32px;
+          margin-left: 26px;
           margin-bottom: 14px;
         }
         .feature-group-title {
