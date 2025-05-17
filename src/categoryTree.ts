@@ -44,7 +44,27 @@ export class DevTwinPanelProvider {
         #header h1 { font-size: 1.6em; margin: 0; font-weight: 600; }
         #header p { color: var(--vscode-descriptionForeground); margin: 16px 0 0 0; font-size: 1.05em; }
         .search-container { width: 100%; max-width: 700px; margin: 24px 0 0 0; position: relative; display: flex; }
-        .search { flex: 1 1 auto; width: 100%; min-width: 0; }
+        .search { flex: 1 1 auto; width: 100%; min-width: 0; padding-right: 32px; }
+        .search-clear-btn {
+          position: absolute;
+          right: 16px;
+          top: 50%;
+          transform: translateY(-50%);
+          font-size: 1.3em;
+          color: var(--vscode-descriptionForeground);
+          background: none;
+          border: none;
+          cursor: pointer;
+          z-index: 2;
+          padding: 0 4px;
+          line-height: 1;
+          user-select: none;
+          display: none;
+        }
+        .search-clear-btn:active, .search-clear-btn:focus {
+          color: var(--vscode-editorWidget-foreground, #fff);
+          outline: 2px solid var(--vscode-focusBorder, #0078d4);
+        }
         #content { width: 100%; max-width: 700px; margin: 0; }
         .category-panel {
           background: linear-gradient(135deg, var(--vscode-editorWidget-background, #23272e) 90%, var(--vscode-editor-background, #1e2024) 100%);

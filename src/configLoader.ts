@@ -1,91 +1,45 @@
-// Utility to load configuration JSON from a public GitHub repository and cache it locally
+// Utility to load configuration JSON from a local file and access templates locally
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import fetch from 'node-fetch';
-
-const CONFIG_URL = 'https://raw.githubusercontent.com/kristianleonhardanticimex/DevTwin/main/config/devtwin-config.json';
-const CACHE_DIR = path.join(__dirname, '../../.devtwin-cache');
-const CACHE_FILE = path.join(CACHE_DIR, 'devtwin-config.json');
 
 export async function loadConfig(): Promise<any> {
-    // Try to fetch from GitHub
-    try {
-        const res = await fetch(CONFIG_URL);
-        if (!res.ok) {throw new Error('Network response was not ok');}
-        const json = await res.json();
-        await cacheConfig(json);
-        return json;
-    } catch (err) {
-        // Fallback to local cache
-        if (fs.existsSync(CACHE_FILE)) {
-            const data = fs.readFileSync(CACHE_FILE, 'utf-8');
-            return JSON.parse(data);
-        } else {
-            vscode.window.showErrorMessage('Failed to load configuration from GitHub and no local cache found.');
-            throw err;
-        }
+    // Load config from local file only
+    const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri.fsPath || '';
+    const configPath = path.join(workspaceRoot, 'config', 'devtwin-config.json');
+    if (fs.existsSync(configPath)) {
+        const data = fs.readFileSync(configPath, 'utf-8');
+        return JSON.parse(data);
+    } else {
+        vscode.window.showErrorMessage('Local config file not found: ' + configPath);
+        throw new Error('Local config file not found');
     }
 }
 
-export async function cacheConfig(json: any) {
-    if (!fs.existsSync(CACHE_DIR)) {
-        fs.mkdirSync(CACHE_DIR);
-    }
-    fs.writeFileSync(CACHE_FILE, JSON.stringify(json, null, 2), 'utf-8');
+export async function cacheConfig(_json: any) {
+    // No-op: caching not needed for local config
 }
 
 export async function refreshConfig(): Promise<any> {
-    // Force reload from GitHub
-    try {
-        const res = await fetch(CONFIG_URL);
-        if (!res.ok) {throw new Error('Network response was not ok');}
-        const json = await res.json();
-        await cacheConfig(json);
-        vscode.window.showInformationMessage('DevTwin config refreshed from GitHub.');
-        return json;
-    } catch (err) {
-        vscode.window.showErrorMessage('Failed to refresh configuration from GitHub.');
-        throw err;
-    }
+    // No-op: always use local config
+    vscode.window.showInformationMessage('DevTwin config reloaded from local file.');
+    return loadConfig();
 }
 
-// Helper to get template content from GitHub (cloud-first)
-async function getTemplateContent(type: 'category' | 'subcategory' | 'feature', id: string): Promise<string> {
-    const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/kristianleonhardanticimex/DevTwin/main/config/templates/';
-    const url = `${GITHUB_RAW_BASE}${id}.md`;
-    try {
-        const res = await fetch(url);
-        if (res.ok) {
-            let content = await res.text();
-            // Remove any START/END block comments and verbose headers
-            content = content.replace(/<!-- START:[\s\S]*?-->/g, '')
-                             .replace(/<!-- END:[\s\S]*?-->/g, '')
-                             .replace(/<!--([\s\S]*?)-->/g, '')
-                             .replace(/^\s+|\s+$/g, '');
-            return content + '\n';
-        }
-    } catch (err) {
-        console.warn('Failed to fetch template from GitHub:', url, err);
-    }
-    // Fallback to local if GitHub fetch fails
+// Helper to get template content from local file only
+async function getTemplateContent(_type: 'category' | 'subcategory' | 'feature', id: string): Promise<string> {
     const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri.fsPath || '';
-    const candidatePaths = [
-        path.join(workspaceRoot, 'config', 'templates', `${id}.md`),
-        path.join(process.cwd(), 'config', 'templates', `${id}.md`)
-    ];
-    for (const templatePath of candidatePaths) {
-        if (fs.existsSync(templatePath)) {
-            let content = fs.readFileSync(templatePath, 'utf-8');
-            content = content.replace(/<!-- START:[\s\S]*?-->/g, '')
-                             .replace(/<!-- END:[\s\S]*?-->/g, '')
-                             .replace(/<!--([\s\S]*?)-->/g, '')
-                             .replace(/^\s+|\s+$/g, '');
-            return content + '\n';
-        }
+    const templatePath = path.join(workspaceRoot, 'config', 'templates', `${id}.md`);
+    if (fs.existsSync(templatePath)) {
+        let content = fs.readFileSync(templatePath, 'utf-8');
+        content = content.replace(/<!-- START:[\s\S]*?-->/g, '')
+                         .replace(/<!-- END:[\s\S]*?-->/g, '')
+                         .replace(/<!--([\s\S]*?)-->/g, '')
+                         .replace(/^\s+|\s+$/g, '');
+        return content + '\n';
     }
     // If missing, return a clear warning block
-    return `\n<!-- MISSING TEMPLATE: ${id}.md (${type}) -->\n`;
+    return `\n<!-- MISSING TEMPLATE: ${id}.md -->\n`;
 }
 
 export async function handleApplySelection(selection: { subcategories: string[]; features: string[] }) {
