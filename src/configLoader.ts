@@ -84,8 +84,8 @@ async function getTemplateContent(type: 'category' | 'subcategory' | 'feature', 
             return content + '\n';
         }
     }
-    console.warn('Template not found in GitHub or any candidate path:', url, candidatePaths);
-    return `<!-- Missing template: ${id} (${type}) -->\n`;
+    // If missing, return a clear warning block
+    return `\n<!-- MISSING TEMPLATE: ${id}.md (${type}) -->\n`;
 }
 
 export async function handleApplySelection(selection: { subcategories: string[]; features: string[] }) {
