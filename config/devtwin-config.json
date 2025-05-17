@@ -565,7 +565,7 @@
               "name": "Tools",
               "description": "Tools for integrating with MCP and developer portals.",
               "features": [
-                { "id": "github-mcp", "name": "GitHub MCP", "description": "Integrate with GitHub's Model Context Protocol." },
+                { "id": "github-mcp", "name": "GitHub MCP", "description": "Integrate with GitHub's Model Context Protocol.", "tags": [{ "label": "Tool", "color": "#d32f2f", "url": "https://github.com/github/github-mcp-server" }] },
                 { "id": "playwright-mcp", "name": "Playwright MCP", "description": "Integrate Playwright with MCP." },
                 { "id": "backstage", "name": "Backstage.io", "description": "Developer portal for managing software." },
                 { "id": "mkdocs-docusaurus", "name": "mkdocs / Docusaurus", "description": "Static site generators for documentation." }

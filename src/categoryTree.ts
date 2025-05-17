@@ -134,6 +134,15 @@ export class DevTwinPanelProvider {
           line-height: 1.6;
           word-break: break-word;
         }
+        .feature-tag {
+          display: inline-block;
+          margin-right: 7px;
+          vertical-align: middle;
+          font-size: 0.85em;
+          border-radius: 4px;
+          padding: 2px 7px;
+          color: #fff;
+        }
         .vscode-button {
           margin: 32px 0 0 0;
           display: block;
@@ -182,7 +191,13 @@ export class DevTwinPanelProvider {
                   for (const feat of group.features) {
                     html += `<div class='feature'>`;
                     html += `<vscode-checkbox class='feature-checkbox' data-feature='${feat.id}' data-parent='${sub.id}' data-group='${group.id}' data-recommend='${encodeURIComponent(JSON.stringify(feat.recommendations || []))}'></vscode-checkbox>`;
-                    html += `<span class='feature-desc'><b>${feat.name}</b>${feat.description ? ' - ' + feat.description : ''}</span>`;
+                    let tagsHtml = '';
+                    if (feat.tags && Array.isArray(feat.tags)) {
+                      for (const tag of feat.tags) {
+                        tagsHtml += `<span class='feature-tag' style='background:${tag.color};color:#fff;font-weight:bold;border-radius:4px;padding:2px 7px;font-size:0.85em;margin-right:7px;vertical-align:middle;' ${tag.url ? `onclick=\"window.open('${tag.url}','_blank')\"` : ''}>${tag.label}</span>`;
+                      }
+                    }
+                    html += `<span class='feature-desc'>${tagsHtml}<b>${feat.name}</b>${feat.description ? ' - ' + feat.description : ''}</span>`;
                     html += `</div>`;
                   }
                   html += `</div>`;
