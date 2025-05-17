@@ -1,35 +1,38 @@
-// Utility to load configuration JSON from a local file and access templates locally
+// Utility to load configuration JSON from the extension's bundled assets and access templates locally
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
+let extensionPath: string = '';
+export function setExtensionPath(context: vscode.ExtensionContext) {
+    extensionPath = context.extensionPath;
+}
+
 export async function loadConfig(): Promise<any> {
-    // Load config from local file only
-    const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri.fsPath || '';
-    const configPath = path.join(workspaceRoot, 'config', 'devtwin-config.json');
+    // Always load config from the extension's bundled assets
+    const configPath = path.join(extensionPath, 'config', 'devtwin-config.json');
     if (fs.existsSync(configPath)) {
         const data = fs.readFileSync(configPath, 'utf-8');
         return JSON.parse(data);
     } else {
-        vscode.window.showErrorMessage('Local config file not found: ' + configPath);
-        throw new Error('Local config file not found');
+        vscode.window.showErrorMessage('Bundled config file not found: ' + configPath);
+        throw new Error('Bundled config file not found');
     }
 }
 
 export async function cacheConfig(_json: any) {
-    // No-op: caching not needed for local config
+    // No-op: caching not needed for bundled config
 }
 
 export async function refreshConfig(): Promise<any> {
-    // No-op: always use local config
-    vscode.window.showInformationMessage('DevTwin config reloaded from local file.');
+    // No-op: always use bundled config
+    vscode.window.showInformationMessage('DevTwin config reloaded from bundled assets.');
     return loadConfig();
 }
 
-// Helper to get template content from local file only
-async function getTemplateContent(_type: 'category' | 'subcategory' | 'feature', id: string): Promise<string> {
-    const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri.fsPath || '';
-    const templatePath = path.join(workspaceRoot, 'config', 'templates', `${id}.md`);
+// Helper to get template content from bundled assets only
+export async function getTemplateContent(_type: 'category' | 'subcategory' | 'feature', id: string): Promise<string> {
+    const templatePath = path.join(extensionPath, 'config', 'templates', `${id}.md`);
     if (fs.existsSync(templatePath)) {
         let content = fs.readFileSync(templatePath, 'utf-8');
         content = content.replace(/<!-- START:[\s\S]*?-->/g, '')
@@ -77,7 +80,7 @@ export async function handleApplySelection(selection: { subcategories: string[];
     }
     // Write to .github/copilot-instructions.md, backup if exists
     try {
-        const githubDir = path.join(vscode.workspace.workspaceFolders?.[0].uri.fsPath || '', '.github');
+        const githubDir = path.join(extensionPath, '.github');
         if (!fs.existsSync(githubDir)) { fs.mkdirSync(githubDir); }
         const outFile = path.join(githubDir, 'copilot-instructions.md');
         const bakFile = path.join(githubDir, 'copilot-instructions.bak.md');
@@ -95,8 +98,7 @@ export async function handleApplySelection(selection: { subcategories: string[];
 
 // Loads and parses the existing copilot-instructions.md file, returning a map of found blocks and warnings for missing hierarchy
 export async function loadCopilotInstructions(): Promise<{ blocks: Record<string, string>, warnings: string[] }> {
-    const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri.fsPath || '';
-    const filePath = path.join(workspaceRoot, '.github', 'copilot-instructions.md');
+    const filePath = path.join(extensionPath, '.github', 'copilot-instructions.md');
     const blocks: Record<string, string> = {};
     const warnings: string[] = [];
     if (!fs.existsSync(filePath)) {

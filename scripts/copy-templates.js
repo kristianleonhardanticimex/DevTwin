@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 function copyDir(src, dest) {
-    if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+    if (!fs.existsSync(dest)) { fs.mkdirSync(dest, { recursive: true }); }
     for (const file of fs.readdirSync(src)) {
         const srcPath = path.join(src, file);
         const destPath = path.join(dest, file);
@@ -16,12 +16,12 @@ function copyDir(src, dest) {
 }
 
 const workspaceRoot = process.cwd();
-const srcTemplates = path.join(workspaceRoot, 'config', 'templates');
-const destTemplates = path.join(workspaceRoot, '.vscode-test', 'workspace', 'config', 'templates');
+const srcConfig = path.join(workspaceRoot, 'config');
+const destConfig = path.join(workspaceRoot, '.vscode-test', 'workspace', 'config');
 
-if (fs.existsSync(srcTemplates)) {
-    copyDir(srcTemplates, destTemplates);
-    console.log('Copied config/templates for test workspace.');
+if (fs.existsSync(srcConfig)) {
+    copyDir(srcConfig, destConfig);
+    console.log('Copied config/ (including templates) for test workspace.');
 } else {
-    console.warn('No config/templates directory found to copy.');
+    console.warn('No config directory found to copy.');
 }
