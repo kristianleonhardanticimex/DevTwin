@@ -49,6 +49,27 @@
               "recommendations": []
             }
           ]
+        },
+        {
+          "id": "2-2-versioning",
+          "name": "Versioning & Release Management",
+          "description": "Ensure consistent versioning and changelog practices across all languages and projects.",
+          "defaultFeatures": ["2-2-1-semver", "2-2-2-changelog-workflow"],
+          "recommendations": [],
+          "features": [
+            {
+              "id": "2-2-1-semver",
+              "name": "Semantic Versioning",
+              "description": "Use Semantic Versioning for all projects. The version must be stored in a version file and automatically bumped for every release.",
+              "recommendations": []
+            },
+            {
+              "id": "2-2-2-changelog-workflow",
+              "name": "Changelog & Release Workflow",
+              "description": "For every version bump, update docs/changelog.md with the new version, date, and summary of changes.",
+              "recommendations": []
+            }
+          ]
         }
       ]
     }
