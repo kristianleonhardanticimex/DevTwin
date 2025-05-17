@@ -63,7 +63,7 @@ export class DevTwinPanelProvider {
         .category-panel {
           background: linear-gradient(135deg, var(--vscode-editorWidget-background, #23272e) 90%, var(--vscode-editor-background, #1e2024) 100%);
           border-radius: 8px;
-          padding: 18px 18px 12px 18px;
+          padding: 18px 18px 0 18px;
           margin-bottom: 24px;
           box-shadow: 0 1px 4px 0 rgba(0,0,0,0.07);
           width: 100%;
@@ -76,7 +76,7 @@ export class DevTwinPanelProvider {
         .category-toggle { font-size: 1.2em; margin-right: 10px; transition: transform 0.2s; }
         .category-toggle.collapsed { transform: rotate(-90deg); }
         .category-desc { color: var(--vscode-descriptionForeground); font-size: 1em; margin-bottom: 12px; margin-left: 44px; }
-        .category-content { padding: 0 18px 12px 18px; }
+        .category-content { padding: 0 18px 12px 18px; margin-bottom: 0; }
         .category-content.collapsed { display: none; }
         .subcategory { margin-left: 0.5em; margin-bottom: 10px; }
         .subcategory-title { font-weight: 500; }
