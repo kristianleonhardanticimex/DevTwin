@@ -37,6 +37,7 @@ export class DevTwinPanelProvider {
         const config = await loadConfig();
         let html = `
         <link rel="stylesheet" href="https://unpkg.com/@vscode/webview-ui-toolkit@1.0.0/dist/toolkit.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
         <script type="module" src="https://unpkg.com/@vscode/webview-ui-toolkit@1.0.0/dist/toolkit.min.js"></script>
         <style>
         body {
@@ -194,7 +195,8 @@ export class DevTwinPanelProvider {
                     let tagsHtml = '';
                     if (feat.tags && Array.isArray(feat.tags)) {
                       for (const tag of feat.tags) {
-                        tagsHtml += `<span class='feature-tag' style='background:${tag.color};color:#fff;font-weight:bold;border-radius:4px;padding:2px 7px;font-size:0.85em;margin-right:7px;vertical-align:middle;' ${tag.url ? `onclick=\"window.open('${tag.url}','_blank')\"` : ''}>${tag.label}</span>`;
+                        // Render only the Font Awesome wrench icon, no label text
+                        tagsHtml += `<span class='feature-tag' style='background:${tag.color};color:#fff;border-radius:4px;padding:2px 7px;font-size:1.1em;margin-right:7px;vertical-align:middle;display:inline-flex;align-items:center;gap:4px;cursor:${tag.url ? 'pointer' : 'default'};' ${tag.url ? `onclick=\"window.open('${tag.url}','_blank')\"` : ''} title='This feature requires an external tool'><i class='fa fa-wrench'></i></span>`;
                       }
                     }
                     html += `<span class='feature-desc'>${tagsHtml}<b>${feat.name}</b>${feat.description ? ' - ' + feat.description : ''}</span>`;
