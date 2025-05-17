@@ -40,10 +40,10 @@ export class DevTwinPanelProvider {
         <script type="module" src="https://unpkg.com/@vscode/webview-ui-toolkit@1.0.0/dist/toolkit.min.js"></script>
         <style>
         body { font-family: var(--vscode-font-family); color: var(--vscode-foreground); background: var(--vscode-editor-background); margin: 16px; box-sizing: border-box; }
-        #header { margin-bottom: 8px; max-width: 700px; margin-left: auto; margin-right: auto; }
-        #header h1 { font-size: 1.6em; margin: 0 0 4px 0; font-weight: 600; }
-        #header p { color: var(--vscode-descriptionForeground); margin: 0 0 18px 0; font-size: 1.05em; }
-        .search-container { width: 100%; max-width: 700px; margin: 0 auto 18px auto; position: relative; display: flex; }
+        #header { margin-bottom: 0; max-width: 700px; margin-left: auto; margin-right: auto; }
+        #header h1 { font-size: 1.6em; margin: 0; font-weight: 600; }
+        #header p { color: var(--vscode-descriptionForeground); margin: 0; font-size: 1.05em; }
+        .search-container { width: 100%; max-width: 700px; margin: 0 auto 0 auto; position: relative; display: flex; }
         .search { flex: 1 1 auto; width: 100%; min-width: 0; }
         .clear-icon {
           position: absolute;
@@ -64,7 +64,7 @@ export class DevTwinPanelProvider {
           background: linear-gradient(135deg, var(--vscode-editorWidget-background, #23272e) 90%, var(--vscode-editor-background, #1e2024) 100%);
           border-radius: 8px;
           padding: 18px 18px 0 18px;
-          margin-bottom: 24px;
+          margin-bottom: 0;
           box-shadow: 0 1px 4px 0 rgba(0,0,0,0.07);
           width: 100%;
           max-width: 700px;
@@ -84,13 +84,11 @@ export class DevTwinPanelProvider {
         .feature { margin-left: 2em; margin-bottom: 6px; display: flex; align-items: center; }
         .feature-desc { color: var(--vscode-descriptionForeground); font-size: 0.97em; margin-left: 0.5em; }
         .vscode-button {
-          margin: 32px 0 0 0;
+          margin: 24px 0 0 0;
           display: block;
           max-width: 700px;
           width: 100%;
           text-align: left;
-          margin-left: auto;
-          margin-right: auto;
         }
         .recommend-banner { background: var(--vscode-editorInfo-background); color: var(--vscode-editorInfo-foreground); border-left: 3px solid var(--vscode-editorInfo-border); padding: 8px 12px; margin: 12px 0; border-radius: 4px; display: flex; align-items: center; gap: 1em; }
         </style>
