@@ -1,100 +1,755 @@
 {
   "categories": [
     {
-      "id": "languages-csharp",
-      "name": "C# / .NET",
-      "description": "Best practices and patterns for C# and .NET development, including project structure, DI, configuration, logging, and testing.",
+      "id": "software-design-architecture",
+      "name": "Software Design & Architecture",
+      "description": "Principles, patterns, and architectures for robust, maintainable software.",
       "subcategories": [
         {
-          "id": "csharp-project-structure",
-          "name": "Project Structure",
-          "features": [
-            { "id": "csharp-clean-architecture", "name": "Clean Architecture", "template": "3-1-1-clean-architecture" },
-            { "id": "csharp-feature-folders", "name": "Feature Folders", "template": "3-1-2-feature-folders" }
+          "id": "object-oriented-programming",
+          "name": "Object-Oriented Programming",
+          "description": "Principles and techniques for OOP design.",
+          "featureGroups": [
+            {
+              "id": "oop-principles",
+              "name": "Principles",
+              "description": "Core OOP principles for robust code.",
+              "features": [
+                { "id": "solid", "name": "SOLID Principles", "description": "Follow SOLID for maintainable, extensible OOP code." },
+                { "id": "inheritance-composition", "name": "Inheritance and Composition", "description": "Use inheritance and composition for code reuse and flexibility." },
+                { "id": "encapsulation", "name": "Encapsulation", "description": "Hide internal state and require all interaction to be performed through methods." },
+                { "id": "polymorphism", "name": "Polymorphism", "description": "Use interfaces and base classes to enable flexible code." },
+                { "id": "abstraction", "name": "Abstraction", "description": "Model complex systems with simplified interfaces." }
+              ]
+            }
           ]
         },
         {
-          "id": "csharp-dependency-injection",
-          "name": "Dependency Injection",
-          "features": [
-            { "id": "csharp-use-built-in-di", "name": "Use Built-in DI", "template": "3-2-1-use-built-in-di" },
-            { "id": "csharp-service-lifetimes", "name": "Service Lifetimes", "template": "3-2-2-service-lifetimes" }
+          "id": "functional-programming",
+          "name": "Functional Programming",
+          "description": "Immutability, pure functions, and functional patterns.",
+          "featureGroups": [
+            {
+              "id": "fp-principles",
+              "name": "Principles",
+              "description": "Key concepts in functional programming.",
+              "features": [
+                { "id": "pure-functions", "name": "Pure Functions", "description": "Functions with no side effects and consistent outputs." },
+                { "id": "immutability", "name": "Immutability", "description": "Prefer immutable data for safer, more predictable code." },
+                { "id": "higher-order-functions", "name": "Higher-Order Functions", "description": "Functions that take or return other functions." },
+                { "id": "pattern-matching", "name": "Pattern Matching", "description": "Use pattern matching for expressive, concise code." },
+                { "id": "monads-functors", "name": "Monads and Functors", "description": "Advanced abstractions for managing effects and data." }
+              ]
+            }
           ]
         },
         {
-          "id": "csharp-configuration",
-          "name": "Configuration & Secrets",
-          "features": [
-            { "id": "csharp-appsettings", "name": "appsettings.json", "template": "3-3-1-appsettings" },
-            { "id": "csharp-user-secrets", "name": "User Secrets", "template": "3-3-2-user-secrets" },
-            { "id": "csharp-env-vars", "name": "Environment Variables", "template": "3-3-3-env-vars" }
+          "id": "design-patterns",
+          "name": "Design Patterns",
+          "description": "Reusable solutions to common software design problems.",
+          "featureGroups": [
+            {
+              "id": "creational-patterns",
+              "name": "Creational",
+              "description": "Patterns for object creation.",
+              "features": [
+                { "id": "singleton", "name": "Singleton", "description": "Ensure a class has only one instance." },
+                { "id": "factory", "name": "Factory", "description": "Create objects without specifying the exact class." }
+              ]
+            },
+            {
+              "id": "behavioral-patterns",
+              "name": "Behavioral",
+              "description": "Patterns for object interaction and responsibility.",
+              "features": [
+                { "id": "strategy", "name": "Strategy", "description": "Select algorithm at runtime." },
+                { "id": "observer", "name": "Observer", "description": "Notify multiple objects of state changes." },
+                { "id": "command", "name": "Command", "description": "Encapsulate requests as objects." },
+                { "id": "mediator", "name": "Mediator", "description": "Reduce coupling between components." },
+                { "id": "state", "name": "State", "description": "Allow an object to alter its behavior when its state changes." },
+                { "id": "visitor", "name": "Visitor", "description": "Separate algorithms from objects on which they operate." }
+              ]
+            },
+            {
+              "id": "structural-patterns",
+              "name": "Structural",
+              "description": "Patterns for object composition and structure.",
+              "features": [
+                { "id": "repository", "name": "Repository", "description": "Abstract data access logic." },
+                { "id": "adapter", "name": "Adapter", "description": "Allow incompatible interfaces to work together." },
+                { "id": "decorator", "name": "Decorator", "description": "Add responsibilities to objects dynamically." }
+              ]
+            }
           ]
         },
         {
-          "id": "csharp-logging",
-          "name": "Logging & Monitoring",
-          "features": [
-            { "id": "csharp-serilog", "name": "Serilog", "template": "3-4-1-serilog" },
-            { "id": "csharp-health-checks", "name": "Health Checks", "template": "3-4-2-health-checks" },
-            { "id": "csharp-app-insights", "name": "Application Insights", "template": "3-4-3-app-insights" }
+          "id": "architecture-styles",
+          "name": "Architecture Styles",
+          "description": "High-level approaches to organizing software systems.",
+          "featureGroups": [
+            {
+              "id": "architecture-patterns",
+              "name": "Patterns",
+              "description": "Common architectural patterns for system design.",
+              "features": [
+                { "id": "onion-architecture", "name": "Onion Architecture", "description": "Emphasize separation of concerns and dependency inversion." },
+                { "id": "clean-architecture", "name": "Clean Architecture", "description": "Organize code into layers for maintainability and testability." },
+                { "id": "hexagonal-architecture", "name": "Hexagonal Architecture", "description": "Isolate core logic from external concerns." },
+                { "id": "microservices", "name": "Microservices", "description": "Build applications as a suite of small, independent services." },
+                { "id": "serverless", "name": "Serverless", "description": "Architect apps using managed cloud functions." },
+                { "id": "monolith", "name": "Monolith", "description": "Build as a single, unified codebase." },
+                { "id": "modular-monolith", "name": "Modular Monolith", "description": "Modularize a monolith for maintainability." }
+              ]
+            }
           ]
         },
         {
-          "id": "csharp-unit-testing",
-          "name": "Unit Testing",
-          "features": [
-            { "id": "csharp-xunit", "name": "xUnit", "template": "3-5-1-xunit" },
-            { "id": "csharp-nunit", "name": "NUnit", "template": "3-5-2-nunit" },
-            { "id": "csharp-mstest", "name": "MSTest", "template": "3-5-3-mstest" }
-          ]
-        },
-        {
-          "id": "csharp-other",
-          "name": "Other C#/.NET Features",
-          "features": [
-            { "id": "csharp-aspnet-webapi", "name": "ASP.NET Web API" },
-            { "id": "csharp-ef-core", "name": "Entity Framework Core" },
-            { "id": "csharp-linq", "name": "LINQ" },
-            { "id": "csharp-minimal-apis", "name": "Minimal APIs" },
-            { "id": "csharp-mediatr", "name": "MediatR" },
-            { "id": "csharp-background-services", "name": "Background Services (IHostedService)" },
-            { "id": "csharp-nullable-ref-types", "name": "Nullable Reference Types" }
+          "id": "architectural-best-practices",
+          "name": "Architectural Best Practices",
+          "description": "Guidelines and principles for effective architecture.",
+          "featureGroups": [
+            {
+              "id": "architecture-principles",
+              "name": "Principles",
+              "description": "Best practices for maintainable architecture.",
+              "features": [
+                { "id": "separation-of-concerns", "name": "Separation of Concerns", "description": "Keep different concerns in separate modules." },
+                { "id": "dependency-inversion", "name": "Dependency Inversion", "description": "Depend on abstractions, not concretions." },
+                { "id": "layered-architecture", "name": "Layered Architecture", "description": "Organize code into logical layers." },
+                { "id": "ddd", "name": "Domain-Driven Design (DDD)", "description": "Model software based on domain logic." },
+                { "id": "cqrs", "name": "CQRS", "description": "Separate read and write operations." },
+                { "id": "event-sourcing", "name": "Event Sourcing", "description": "Persist state as a sequence of events." }
+              ]
+            }
           ]
         }
       ]
     },
     {
-      "id": "languages-javascript",
-      "name": "JavaScript / TypeScript",
-      "description": "Best practices for JavaScript and TypeScript, including frontend frameworks and tooling.",
+      "id": "programming-languages",
+      "name": "Programming Languages",
+      "description": "Best practices, frameworks, and tools for major programming languages.",
       "subcategories": [
         {
-          "id": "js-core",
-          "name": "Core Language Features",
-          "features": [
-            { "id": "js-es-modules", "name": "ES Modules" },
-            { "id": "js-async-await", "name": "Async/Await" },
-            { "id": "js-promises", "name": "Promises" },
-            { "id": "js-typescript", "name": "Type Safety with TypeScript" },
-            { "id": "js-jsdoc", "name": "JSDoc" }
+          "id": "csharp-dotnet",
+          "name": "C# / .NET",
+          "featureGroups": [
+            {
+              "id": "csharp-core",
+              "name": "Core",
+              "features": [
+                { "id": "csharp-di", "name": "Dependency Injection (built-in)", "description": ".NET's DI container for loose coupling." },
+                { "id": "csharp-nullable", "name": "Nullable Reference Types", "description": "Enable null-safety in C# code." }
+              ]
+            },
+            {
+              "id": "csharp-web-apis",
+              "name": "Web & APIs",
+              "features": [
+                { "id": "aspnet-webapi", "name": "ASP.NET Web API", "description": "Build RESTful APIs with ASP.NET Core." },
+                { "id": "minimal-apis", "name": "Minimal APIs", "description": "Lightweight HTTP APIs in ASP.NET Core." }
+              ]
+            },
+            {
+              "id": "csharp-data-orm",
+              "name": "Data & ORM",
+              "features": [
+                { "id": "ef-core", "name": "Entity Framework Core", "description": "ORM for data access in .NET." },
+                { "id": "linq", "name": "LINQ", "description": "Query collections and databases with LINQ." }
+              ]
+            },
+            {
+              "id": "csharp-logging-messaging",
+              "name": "Logging & Messaging",
+              "features": [
+                { "id": "serilog", "name": "Serilog", "description": "Structured logging for .NET applications." },
+                { "id": "mediatr", "name": "MediatR", "description": "In-process messaging and CQRS for .NET." },
+                { "id": "background-services", "name": "Background Services (IHostedService)", "description": "Run background tasks in .NET apps." }
+              ]
+            }
           ]
         },
         {
-          "id": "js-frontend-frameworks",
-          "name": "Frontend Frameworks",
-          "features": [
-            { "id": "js-react", "name": "React", "template": "1-1-react" },
-            { "id": "js-angular", "name": "Angular" },
-            { "id": "js-vue", "name": "Vue" }
+          "id": "javascript-typescript",
+          "name": "JavaScript / TypeScript",
+          "featureGroups": [
+            {
+              "id": "js-language-features",
+              "name": "Language Features",
+              "features": [
+                { "id": "es-modules", "name": "ES Modules", "description": "Use ES module syntax for modular, maintainable code." },
+                { "id": "async-await", "name": "Async/Await", "description": "Write asynchronous code using async/await for clarity and error handling." },
+                { "id": "promises", "name": "Promises", "description": "Use Promises for managing asynchronous operations." },
+                { "id": "typescript", "name": "Type Safety with TypeScript", "description": "Add static typing to JavaScript for safer, more robust code." },
+                { "id": "jsdoc", "name": "JSDoc", "description": "Document code with JSDoc comments for better tooling and maintainability." }
+              ]
+            },
+            {
+              "id": "js-frameworks",
+              "name": "Frameworks",
+              "features": [
+                { "id": "react", "name": "React", "description": "Build user interfaces with React.", "dependencies": ["js-language-features"] },
+                { "id": "angular", "name": "Angular", "description": "Develop applications using Angular.", "dependencies": ["js-language-features"] },
+                { "id": "vue", "name": "Vue", "description": "Create reactive UIs with Vue.", "dependencies": ["js-language-features"] }
+              ]
+            }
           ]
         },
         {
-          "id": "js-ui-testing",
+          "id": "python",
+          "name": "Python",
+          "featureGroups": [
+            {
+              "id": "python-language-features",
+              "name": "Language Features",
+              "features": [
+                { "id": "type-hints", "name": "Type Hints", "description": "Add type annotations for better tooling and safety." },
+                { "id": "virtual-environments", "name": "Virtual Environments", "description": "Isolate dependencies for each project." },
+                { "id": "poetry-pipenv", "name": "Poetry / pipenv", "description": "Modern dependency and environment management." },
+                { "id": "asyncio", "name": "Asyncio", "description": "Write asynchronous code in Python." }
+              ]
+            },
+            {
+              "id": "python-testing",
+              "name": "Testing",
+              "features": [
+                { "id": "pytest", "name": "pytest", "description": "Python's most popular testing framework." }
+              ]
+            },
+            {
+              "id": "python-style",
+              "name": "Style",
+              "features": [
+                { "id": "pep8", "name": "PEP8", "description": "Follow Python's style guide for readable code." }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "golang",
+          "name": "Go (GoLang)",
+          "featureGroups": [
+            {
+              "id": "go-project-structure",
+              "name": "Project Structure",
+              "features": [
+                { "id": "standard-project-layout", "name": "Standard Project Layout", "description": "Organize Go projects for scalability." },
+                { "id": "go-mod", "name": "go.mod", "description": "Manage dependencies and versions." }
+              ]
+            },
+            {
+              "id": "go-language-features",
+              "name": "Language Features",
+              "features": [
+                { "id": "interfaces", "name": "Interfaces", "description": "Define contracts for types." },
+                { "id": "goroutines", "name": "Goroutines", "description": "Lightweight concurrency in Go." },
+                { "id": "channels", "name": "Channels", "description": "Communicate safely between goroutines." },
+                { "id": "error-handling", "name": "Error Handling Patterns", "description": "Idiomatic error handling in Go." }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "rust",
+          "name": "Rust",
+          "featureGroups": [
+            {
+              "id": "rust-project-structure",
+              "name": "Project Structure",
+              "features": [
+                { "id": "cargo-project-layout", "name": "Cargo Project Layout", "description": "Standard structure for Rust projects." }
+              ]
+            },
+            {
+              "id": "rust-language-features",
+              "name": "Language Features",
+              "features": [
+                { "id": "ownership-borrowing", "name": "Ownership & Borrowing", "description": "Memory safety without GC." },
+                { "id": "traits", "name": "Traits", "description": "Define shared behavior." },
+                { "id": "lifetimes", "name": "Lifetimes", "description": "Manage references and memory safety." },
+                { "id": "crates-io", "name": "Crates.io Best Practices", "description": "Package and share Rust code." },
+                { "id": "tokio", "name": "Tokio for Async", "description": "Asynchronous programming in Rust." }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "java",
+          "name": "Java",
+          "featureGroups": [
+            {
+              "id": "java-frameworks",
+              "name": "Frameworks",
+              "features": [
+                { "id": "spring-boot", "name": "Spring Boot", "description": "Rapidly build production-ready Java apps." },
+                { "id": "jpa", "name": "JPA", "description": "Java Persistence API for ORM." },
+                { "id": "lombok", "name": "Lombok", "description": "Reduce boilerplate with annotations." },
+                { "id": "spring-di", "name": "Dependency Injection with Spring", "description": "Use Spring's DI for modularity." }
+              ]
+            },
+            {
+              "id": "java-build-tools",
+              "name": "Build Tools",
+              "features": [
+                { "id": "maven", "name": "Maven", "description": "Java build automation." },
+                { "id": "gradle", "name": "Gradle", "description": "Modern build automation for Java." }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "kotlin",
+          "name": "Kotlin",
+          "featureGroups": [
+            {
+              "id": "kotlin-language-features",
+              "name": "Language Features",
+              "features": [
+                { "id": "coroutines", "name": "Coroutines", "description": "Asynchronous programming in Kotlin." },
+                { "id": "extension-functions", "name": "Extension Functions", "description": "Add new functions to existing types." }
+              ]
+            },
+            {
+              "id": "kotlin-frameworks",
+              "name": "Frameworks",
+              "features": [
+                { "id": "ktor", "name": "Ktor", "description": "Asynchronous web framework for Kotlin." },
+                { "id": "jetpack-compose", "name": "Jetpack Compose (Android)", "description": "Modern UI toolkit for Android." }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "testing-quality",
+      "name": "Testing & Quality",
+      "description": "Unit, integration, and quality practices for robust software.",
+      "subcategories": [
+        {
+          "id": "unit-testing",
+          "name": "Unit Testing",
+          "featureGroups": [
+            {
+              "id": "dotnet-unit-testing",
+              "name": ".NET",
+              "features": [
+                { "id": "xunit", "name": "xUnit", "description": "Microsoft's recommended unit testing framework for .NET." },
+                { "id": "nunit", "name": "NUnit", "description": "Popular alternative unit testing framework for .NET." },
+                { "id": "mstest", "name": "MSTest", "description": "Built-in unit testing framework for .NET." }
+              ]
+            },
+            {
+              "id": "java-unit-testing",
+              "name": "Java",
+              "features": [
+                { "id": "junit", "name": "JUnit", "description": "Most popular Java unit testing framework." },
+                { "id": "testng", "name": "TestNG", "description": "Powerful Java testing framework." }
+              ]
+            },
+            {
+              "id": "js-unit-testing",
+              "name": "JavaScript",
+              "features": [
+                { "id": "jest", "name": "Jest", "description": "Delightful JavaScript testing framework." },
+                { "id": "mocha", "name": "Mocha", "description": "Flexible JavaScript test framework." },
+                { "id": "vitest", "name": "Vitest", "description": "Fast unit testing for Vite projects." }
+              ]
+            },
+            {
+              "id": "python-unit-testing",
+              "name": "Python",
+              "features": [
+                { "id": "pytest", "name": "pytest", "description": "Python's most popular testing framework." }
+              ]
+            },
+            {
+              "id": "go-unit-testing",
+              "name": "Go",
+              "features": [
+                { "id": "go-test", "name": "Go test", "description": "Built-in Go testing tool." }
+              ]
+            },
+            {
+              "id": "rust-unit-testing",
+              "name": "Rust",
+              "features": [
+                { "id": "rust-test", "name": "Rust test", "description": "Built-in Rust testing tool." }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "integration-testing",
+          "name": "Integration Testing",
+          "featureGroups": [
+            {
+              "id": "integration-tools",
+              "name": "Tools",
+              "features": [
+                { "id": "testcontainers", "name": "TestContainers", "description": "Run test dependencies in containers." },
+                { "id": "playwright", "name": "Playwright", "description": "End-to-end browser testing for modern web apps." },
+                { "id": "selenium", "name": "Selenium", "description": "Browser automation for testing web apps." },
+                { "id": "cypress", "name": "Cypress", "description": "Fast, easy, and reliable testing for anything that runs in a browser." }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "test-practices",
+          "name": "Test Practices",
+          "featureGroups": [
+            {
+              "id": "test-patterns",
+              "name": "Patterns",
+              "features": [
+                { "id": "arrange-act-assert", "name": "Arrange-Act-Assert Pattern", "description": "Structure tests for clarity." },
+                { "id": "test-data-builders", "name": "Test Data Builders", "description": "Create complex test data easily." },
+                { "id": "mocking", "name": "Mocking / Faking / Stubbing", "description": "Replace dependencies for isolated tests." }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "devops-cicd",
+      "name": "DevOps & CI/CD",
+      "description": "Automation, pipelines, and deployment best practices.",
+      "subcategories": [
+        {
+          "id": "github-actions-mcp",
+          "name": "GitHub Actions / MCP",
+          "featureGroups": [
+            {
+              "id": "workflow-design",
+              "name": "Workflow",
+              "features": [
+                { "id": "workflow-file-layout", "name": "Workflow File Layout", "description": "Organize workflows for clarity and reuse." },
+                { "id": "reusable-workflows", "name": "Reusable Workflows", "description": "Share workflow logic across projects." },
+                { "id": "secrets-environments", "name": "Secrets and Environments", "description": "Securely manage secrets and environment variables." },
+                { "id": "caching", "name": "Caching", "description": "Speed up builds with dependency caching." }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "azure-pipelines",
+          "name": "Azure Pipelines",
+          "featureGroups": [
+            {
+              "id": "pipeline-features",
+              "name": "Features",
+              "features": [
+                { "id": "multi-stage-pipelines", "name": "Multi-Stage Pipelines", "description": "Model complex workflows with multiple stages." },
+                { "id": "templates-variables", "name": "Templates and Variables", "description": "Reuse pipeline logic and manage configuration." },
+                { "id": "deployment-slots", "name": "Deployment Slots", "description": "Deploy safely with slots." },
+                { "id": "yaml-pipelines", "name": "YAML Pipelines", "description": "Define pipelines as code." }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "docker",
+          "name": "Docker",
+          "featureGroups": [
+            {
+              "id": "docker-features",
+              "name": "Features",
+              "features": [
+                { "id": "multi-stage-builds", "name": "Multi-Stage Builds", "description": "Optimize Docker images with multi-stage builds." },
+                { "id": "docker-compose", "name": "Docker Compose", "description": "Define and run multi-container Docker apps." },
+                { "id": "dockerfile-best-practices", "name": "Dockerfile Best Practices", "description": "Write efficient, secure Dockerfiles." }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "kubernetes",
+          "name": "Kubernetes",
+          "featureGroups": [
+            {
+              "id": "kubernetes-features",
+              "name": "Features",
+              "features": [
+                { "id": "helm-charts", "name": "Helm Charts", "description": "Package and deploy Kubernetes applications." },
+                { "id": "manifests", "name": "Manifests", "description": "Declarative configuration for Kubernetes resources." },
+                { "id": "kustomize", "name": "Kustomize", "description": "Customize Kubernetes YAML configurations." },
+                { "id": "liveness-readiness-probes", "name": "Liveness/Readiness Probes", "description": "Monitor app health in Kubernetes." }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "documentation-dx",
+      "name": "Documentation & DX",
+      "description": "Documentation standards and developer experience integrations.",
+      "subcategories": [
+        {
+          "id": "documentation-practices",
+          "name": "Documentation Practices",
+          "featureGroups": [
+            {
+              "id": "doc-templates",
+              "name": "Templates",
+              "features": [
+                { "id": "readme-templates", "name": "README.md Templates", "description": "Standardize project documentation." },
+                { "id": "adr", "name": "ADR (Architecture Decision Records)", "description": "Record architectural decisions." }
+              ]
+            },
+            {
+              "id": "doc-frameworks",
+              "name": "Frameworks",
+              "features": [
+                { "id": "diataxis", "name": "Diataxis Framework", "description": "Organize documentation by purpose." },
+                { "id": "docstrings-jsdoc-xml", "name": "Docstrings / JSDoc / XML Comments", "description": "Document code for better tooling." }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "mcp-integrations",
+          "name": "MCP Integrations",
+          "featureGroups": [
+            {
+              "id": "mcp-tools",
+              "name": "Tools",
+              "features": [
+                { "id": "github-mcp", "name": "GitHub MCP", "description": "Integrate with GitHub's Model Context Protocol." },
+                { "id": "playwright-mcp", "name": "Playwright MCP", "description": "Integrate Playwright with MCP." },
+                { "id": "backstage", "name": "Backstage.io", "description": "Developer portal for managing software." },
+                { "id": "mkdocs-docusaurus", "name": "mkdocs / Docusaurus", "description": "Static site generators for documentation." }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "frontend",
+      "name": "Frontend",
+      "description": "Modern frontend frameworks, patterns, and UI testing.",
+      "subcategories": [
+        {
+          "id": "react",
+          "name": "React",
+          "featureGroups": [
+            {
+              "id": "react-component-patterns",
+              "name": "Component Patterns",
+              "features": [
+                { "id": "functional-components", "name": "Functional Components", "description": "Use function-based components for simplicity and performance." },
+                { "id": "component-composition", "name": "Component Composition", "description": "Build complex UIs by composing smaller components." }
+              ]
+            },
+            {
+              "id": "react-state-data",
+              "name": "State & Data",
+              "features": [
+                { "id": "hooks", "name": "Hooks", "description": "Manage state and side effects in React components." },
+                { "id": "context-api", "name": "Context API", "description": "Share state across the component tree." },
+                { "id": "react-query", "name": "React Query", "description": "Data fetching and caching for React apps." },
+                { "id": "zustand-redux", "name": "Zustand / Redux Toolkit", "description": "State management libraries for React." }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "angular",
+          "name": "Angular",
+          "featureGroups": [
+            {
+              "id": "angular-structure",
+              "name": "Structure",
+              "features": [
+                { "id": "ngmodules", "name": "NgModules", "description": "Organize Angular apps into cohesive blocks of functionality." },
+                { "id": "angular-cli", "name": "Angular CLI", "description": "Command-line tooling for Angular projects." }
+              ]
+            },
+            {
+              "id": "angular-patterns",
+              "name": "Patterns",
+              "features": [
+                { "id": "angular-di", "name": "Dependency Injection", "description": "Use Angular's DI system for modularity and testability." },
+                { "id": "rxjs-patterns", "name": "RxJS Patterns", "description": "Reactive programming with RxJS in Angular." }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "vue",
+          "name": "Vue",
+          "featureGroups": [
+            {
+              "id": "vue-structure",
+              "name": "Structure",
+              "features": [
+                { "id": "composition-api", "name": "Composition API", "description": "Modern API for organizing Vue component logic." },
+                { "id": "vuex", "name": "Vuex", "description": "State management for Vue applications." },
+                { "id": "vue-router", "name": "Vue Router", "description": "Routing for single-page Vue apps." }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ui-testing",
           "name": "UI Testing",
-          "features": [
-            { "id": "js-playwright", "name": "Playwright" },
-            { "id": "js-testing-library", "name": "Testing Library (React, Angular)" },
-            { "id": "js-storybook", "name": "Storybook" }
+          "featureGroups": [
+            {
+              "id": "ui-testing-tools",
+              "name": "Tools",
+              "features": [
+                { "id": "playwright", "name": "Playwright", "description": "End-to-end browser testing for any frontend." },
+                { "id": "testing-library", "name": "Testing Library (React, Angular)", "description": "User-centric component testing for React and Angular.", "dependencies": ["react", "angular"] },
+                { "id": "storybook", "name": "Storybook", "description": "Develop and document UI components in isolation." }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "security",
+      "name": "Security",
+      "description": "Secure coding practices, authentication, and secrets management.",
+      "subcategories": [
+        {
+          "id": "security-practices",
+          "name": "Security Practices",
+          "featureGroups": [
+            {
+              "id": "security-practices-group",
+              "name": "Practices",
+              "features": [
+                { "id": "owasp-top-10", "name": "OWASP Top 10", "description": "Address the most critical security risks to web applications." },
+                { "id": "secure-code-practices", "name": "Secure Code Practices", "description": "Write code that avoids common vulnerabilities." }
+              ]
+            },
+            {
+              "id": "security-techniques",
+              "name": "Techniques",
+              "features": [
+                { "id": "input-validation", "name": "Input Validation / Output Encoding", "description": "Prevent injection attacks." },
+                { "id": "authentication", "name": "Authentication (JWT, OAuth2)", "description": "Securely authenticate users." },
+                { "id": "authorization", "name": "Authorization", "description": "Control access to resources." },
+                { "id": "rate-limiting", "name": "Rate Limiting", "description": "Prevent abuse by limiting requests." },
+                { "id": "secrets-management", "name": "Secrets Management", "description": "Securely store and access secrets." }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "best-practices-principles",
+      "name": "Best Practices & Principles",
+      "description": "General software engineering principles and best practices.",
+      "subcategories": [
+        {
+          "id": "general-principles",
+          "name": "General",
+          "featureGroups": [
+            {
+              "id": "general-principles-group",
+              "name": "Principles",
+              "features": [
+                { "id": "boy-scout-rule", "name": "Boy Scout Rule", "description": "Always leave the codebase cleaner than you found it." },
+                { "id": "kiss", "name": "Keep It Simple, Stupid (KISS)", "description": "Prefer simple solutions." },
+                { "id": "dry", "name": "Don't Repeat Yourself (DRY)", "description": "Avoid code duplication." },
+                { "id": "yagni", "name": "You Aren’t Gonna Need It (YAGNI)", "description": "Only build what you need." },
+                { "id": "fail-fast", "name": "Fail Fast", "description": "Detect errors early." },
+                { "id": "twelve-factor-app", "name": "Twelve-Factor App", "description": "Best practices for building SaaS apps." },
+                { "id": "convention-over-configuration", "name": "Convention over Configuration", "description": "Prefer sensible defaults." }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "code-management",
+      "name": "Code Management",
+      "description": "Branching, versioning, and repository strategies.",
+      "subcategories": [
+        {
+          "id": "workflows",
+          "name": "Workflows",
+          "featureGroups": [
+            {
+              "id": "workflow-strategies",
+              "name": "Strategies",
+              "features": [
+                { "id": "git-flow", "name": "Git Flow", "description": "Branching model for managing features and releases." },
+                { "id": "github-flow", "name": "GitHub Flow", "description": "Lightweight workflow for continuous delivery." },
+                { "id": "trunk-based-development", "name": "Trunk-Based Development", "description": "Keep a single branch for all development." }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "versioning",
+          "name": "Versioning",
+          "featureGroups": [
+            {
+              "id": "versioning-group",
+              "name": "Versioning",
+              "features": [
+                { "id": "semantic-versioning", "name": "Semantic Versioning", "description": "Use MAJOR.MINOR.PATCH versioning for all projects." },
+                { "id": "conventional-commits", "name": "Conventional Commits", "description": "Use a standard format for commit messages." }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "repositories",
+          "name": "Repositories",
+          "featureGroups": [
+            {
+              "id": "repo-strategies",
+              "name": "Strategies",
+              "features": [
+                { "id": "monorepo-polyrepo", "name": "Monorepo vs Polyrepo", "description": "Choose the right repo strategy for your team." }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tooling",
+      "name": "Tooling",
+      "description": "Linters, code quality, and automation tools.",
+      "subcategories": [
+        {
+          "id": "linters",
+          "name": "Linters",
+          "featureGroups": [
+            {
+              "id": "linters-group",
+              "name": "Linters",
+              "features": [
+                { "id": "eslint-tslint", "name": "ESLint / TSLint", "description": "Lint JavaScript and TypeScript code." },
+                { "id": "prettier", "name": "Prettier", "description": "Code formatter for consistent style." },
+                { "id": "stylecop-fxcop", "name": "StyleCop / FxCop", "description": "Lint and analyze .NET code." }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "quality-tools",
+          "name": "Quality Tools",
+          "featureGroups": [
+            {
+              "id": "quality-tools-group",
+              "name": "Quality Tools",
+              "features": [
+                { "id": "sonarqube", "name": "SonarQube", "description": "Continuous inspection of code quality." },
+                { "id": "dependabot", "name": "Dependabot", "description": "Automated dependency updates." },
+                { "id": "renovate", "name": "Renovate", "description": "Automated dependency management and updates." }
+              ]
+            }
           ]
         }
       ]

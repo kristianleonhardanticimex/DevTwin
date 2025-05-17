@@ -39,114 +39,159 @@ export class DevTwinPanelProvider {
         <link rel="stylesheet" href="https://unpkg.com/@vscode/webview-ui-toolkit@1.0.0/dist/toolkit.min.css">
         <script type="module" src="https://unpkg.com/@vscode/webview-ui-toolkit@1.0.0/dist/toolkit.min.js"></script>
         <style>
-        body { font-family: var(--vscode-font-family); color: var(--vscode-foreground); background: var(--vscode-editor-background); margin: 16px; box-sizing: border-box; }
-        #header { margin-bottom: 0; width: 100%; max-width: 700px; margin-left: 0; margin-right: 0; padding: 0; }
-        #header h1 { font-size: 1.6em; margin: 0; font-weight: 600; }
-        #header p { color: var(--vscode-descriptionForeground); margin: 16px 0 0 0; font-size: 1.05em; }
-        .search-container { width: 100%; max-width: 700px; margin: 24px 0 0 0; position: relative; display: flex; }
-        .search { flex: 1 1 auto; width: 100%; min-width: 0; padding-right: 32px; }
-        .search-clear-btn {
-          position: absolute;
-          right: 16px;
-          top: 50%;
-          transform: translateY(-50%);
-          font-size: 1.3em;
+        body {
+          font-family: var(--vscode-font-family);
+          color: var(--vscode-foreground);
+          background: var(--vscode-editor-background);
+          margin: 0;
+          box-sizing: border-box;
+        }
+        #container {
+          max-width: 760px;
+          margin: 0 auto;
+          padding: 24px 24px 0 24px;
+        }
+        #header h1 {
+          font-size: 1.6em;
+          margin: 0 0 8px 0;
+          font-weight: 600;
+        }
+        #header p {
           color: var(--vscode-descriptionForeground);
-          background: none;
-          border: none;
-          cursor: pointer;
-          z-index: 2;
-          padding: 0 4px;
-          line-height: 1;
-          user-select: none;
-          display: none;
+          margin: 0 0 24px 0;
+          font-size: 1.05em;
         }
-        .search-clear-btn:active, .search-clear-btn:focus {
-          color: var(--vscode-editorWidget-foreground, #fff);
-          outline: 2px solid var(--vscode-focusBorder, #0078d4);
-        }
-        #content { width: 100%; max-width: 700px; margin: 0; }
-        .category-panel {
-          background: linear-gradient(135deg, var(--vscode-editorWidget-background, #23272e) 90%, var(--vscode-editor-background, #1e2024) 100%);
-          border-radius: 8px;
-          padding: 18px 18px 0 18px;
-          margin-bottom: 0;
-          box-shadow: 0 1px 4px 0 rgba(0,0,0,0.07);
+        .search-container {
           width: 100%;
-          max-width: 700px;
-          margin: 24px 0 0 0;
+          margin-bottom: 32px;
         }
-        .category-header { display: block; }
-        .category-title { font-size: 1.15em; font-weight: 600; flex: 1; }
-        .category-toggle { font-size: 1.2em; margin-right: 10px; transition: transform 0.2s; }
-        .category-toggle.collapsed { transform: rotate(-90deg); }
-        .category-desc { color: var(--vscode-descriptionForeground); font-size: 1em; margin-bottom: 12px; margin-left: 44px; }
-        .category-content { padding: 0 18px 12px 18px; margin-bottom: 0; }
-        .category-content.collapsed { display: none; }
-        .subcategory { margin-left: 0.5em; margin-bottom: 10px; }
-        .subcategory-title { font-weight: 500; }
-        .subcategory-desc { color: var(--vscode-descriptionForeground); font-size: 0.98em; margin-bottom: 18px; margin-left: 1.5em; }
-        .feature {
-          margin-left: 2em;
-          margin-bottom: 6px;
+        .search {
+          width: 100%;
+        }
+        #content {
+          width: 100%;
+        }
+        .category {
+          margin-bottom: 32px;
+        }
+        .category-title {
+          font-size: 1.18em;
+          font-weight: 600;
+          margin: 0;
+        }
+        .category-desc {
+          color: var(--vscode-descriptionForeground);
+          font-size: 1em;
+          margin: 2px 0 16px 0;
+        }
+        .subcategory {
+          margin-left: 32px;
+          margin-bottom: 18px;
+        }
+        .subcategory-header {
           display: flex;
-          align-items: flex-start;
+          align-items: center;
+        }
+        .subcategory-checkbox {
+          margin-right: 0.6em;
+        }
+        .subcategory-title {
+          font-weight: 500;
+          font-size: 1.07em;
+        }
+        .subcategory-desc {
+          color: var(--vscode-descriptionForeground);
+          font-size: 0.98em;
+          margin: 2px 0 12px 0;
+        }
+        .feature-group {
+          margin-left: 32px;
+          margin-bottom: 14px;
+        }
+        .feature-group-title {
+          font-weight: 500;
+          font-size: 1.04em;
+        }
+        .feature-group-desc {
+          color: var(--vscode-descriptionForeground);
+          font-size: 0.97em;
+          margin: 2px 0 8px 0;
+        }
+        .feature-list {
+          margin-left: 32px;
+        }
+        .feature {
+          display: flex;
+          align-items: center;
+          margin-bottom: 8px;
+        }
+        .feature-checkbox {
+          margin-right: 0.5em;
         }
         .feature-desc {
           color: var(--vscode-descriptionForeground);
           font-size: 0.97em;
-          margin-left: 0.5em;
-          display: block;
           line-height: 1.6;
           word-break: break-word;
-          padding-top: 2px;
         }
         .vscode-button {
           margin: 32px 0 0 0;
           display: block;
-          max-width: 700px;
           width: 100%;
           text-align: left;
         }
-        .recommend-banner { background: var(--vscode-editorInfo-background); color: var(--vscode-editorInfo-foreground); border-left: 3px solid var(--vscode-editorInfo-border); padding: 8px 12px; margin: 12px 0; border-radius: 4px; display: flex; align-items: center; gap: 1em; }
         </style>
-        <div id='header'>
-          <h1>DevTwin Instruction Builder</h1>
-          <p>Build your <b>.github/copilot-instructions.md</b> by selecting categories, subcategories, and features that define how GitHub Copilot (or other AI assistants) should behave. Choose your preferred coding style, tools, and practices. Use the search bar to quickly filter options. Click <b>Apply Selection</b> to generate or update your instructions file.</p>
-        </div>
-        <div class='search-container'>
-          <vscode-text-field class='search' placeholder='Search categories, subcategories, features...' onchange='filterItems()'></vscode-text-field>
-        </div>
-        <div id='recommend-banner' style='display:none'></div>
-        <div id='content'>
+        <div id='container'>
+          <div id='header'>
+            <h1>DevTwin Instruction Builder</h1>
+            <p>Build your <b>.github/copilot-instructions.md</b> by selecting categories, subcategories, feature groups, and features that define how GitHub Copilot (or other AI assistants) should behave. Choose your preferred coding style, tools, and practices. Use the search bar to quickly filter options. Click <b>Apply Selection</b> to generate or update your instructions file.</p>
+          </div>
+          <div class='search-container'>
+            <vscode-text-field class='search' placeholder='Search categories, subcategories, feature groups, features...' onchange='filterItems()'></vscode-text-field>
+          </div>
+          <div id='recommend-banner' style='display:none'></div>
+          <div id='content'>
         `;
         for (const cat of config.categories) {
-            html += `<div class='category-panel' data-category='${cat.id}'>`;
-            // Category header: title and description stacked vertically, left-aligned
-            html += `<div class='category-header' style='display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 8px;'>`;
-            html += `<span class='category-title'>${cat.name}</span>`;
-            if (cat.description) {
-                html += `<span class='category-desc' style='margin-left: 0; margin-bottom: 0;'>${cat.description}</span>`;
+          html += `<div class='category'>`;
+          html += `<div class='category-title'>${cat.name}</div>`;
+          if (cat.description) {
+            html += `<div class='category-desc'>${cat.description}</div>`;
+          }
+          for (const sub of cat.subcategories) {
+            html += `<div class='subcategory'>`;
+            html += `<div class='subcategory-header' style='display: flex; align-items: flex-start;'>`;
+            html += `<vscode-checkbox class='subcategory-checkbox' data-subcategory='${sub.id}' data-recommend='${encodeURIComponent(JSON.stringify(sub.recommendations || []))}'></vscode-checkbox>`;
+            html += `<div style='display: flex; flex-direction: column;'>`;
+            html += `<span class='subcategory-title'>${sub.name}</span>`;
+            if (sub.description) {
+              html += `<div class='subcategory-desc'>${sub.description}</div>`;
             }
             html += `</div>`;
-            html += `<div class='category-content' id='content-${cat.id}'>`;
-            for (const sub of cat.subcategories) {
-                html += `<div class='subcategory'>`;
-                // Subcategory title and description stacked vertically, left-aligned
-                html += `<div style='display: flex; flex-direction: column; align-items: flex-start;'>`;
-                html += `<vscode-checkbox class='subcategory-checkbox subcategory-title' data-subcategory='${sub.id}' data-recommend='${encodeURIComponent(JSON.stringify(sub.recommendations || []))}'>${sub.name}</vscode-checkbox>`;
-                if (sub.description) {
-                    html += `<span class='subcategory-desc' style='margin-left: 2.2em; margin-bottom: 0;'>${sub.description}</span><span style='display:block;height:4px' aria-hidden='true'></span>`;
+            html += `</div>`;
+            if (sub.featureGroups && sub.featureGroups.length > 0) {
+              for (const group of sub.featureGroups) {
+                html += `<div class='feature-group'>`;
+                html += `<div class='feature-group-title'>${group.name}</div>`;
+                if (group.description) {
+                  html += `<div class='feature-group-desc'>${group.description}</div>`;
+                }
+                if (group.features && group.features.length > 0) {
+                  html += `<div class='feature-list'>`;
+                  for (const feat of group.features) {
+                    html += `<div class='feature'>`;
+                    html += `<vscode-checkbox class='feature-checkbox' data-feature='${feat.id}' data-parent='${sub.id}' data-group='${group.id}' data-recommend='${encodeURIComponent(JSON.stringify(feat.recommendations || []))}'></vscode-checkbox>`;
+                    html += `<span class='feature-desc'><b>${feat.name}</b>${feat.description ? ' - ' + feat.description : ''}</span>`;
+                    html += `</div>`;
+                  }
+                  html += `</div>`;
                 }
                 html += `</div>`;
-                if (sub.features && sub.features.length > 0) {
-                    for (const feat of sub.features) {
-                        html += `<div class='feature'><vscode-checkbox class='feature-checkbox' data-feature='${feat.id}' data-parent='${sub.id}' data-recommend='${encodeURIComponent(JSON.stringify(feat.recommendations || []))}'></vscode-checkbox> <span class='feature-desc'><b>${feat.name}</b> - ${feat.description || ''}</span></div>`;
-                    }
-                }
-                html += `</div>`;
+              }
             }
-            html += `</div></div>`;
+            html += `</div>`;
+          }
+          html += `</div>`;
         }
         html += `</div><vscode-button id='applySelection'>Apply Selection</vscode-button>`;
         html += `<script type='module'>
@@ -154,13 +199,11 @@ export class DevTwinPanelProvider {
         const config = ${JSON.stringify(config)};
         // --- Feature/subcategory logic ---
         function setFeatureStates(subId, checked) {
-            // Find subcategory config
             const sub = config.categories.flatMap(c => c.subcategories).find(s => s.id === subId);
             const defaultFeatures = (sub && sub.defaultFeatures) ? sub.defaultFeatures : [];
             Array.from(document.querySelectorAll('.feature-checkbox[data-parent="' + subId + '"]')).forEach(function(fEl) {
                 fEl.disabled = !checked;
                 if (checked) {
-                    // Only check if in defaultFeatures
                     fEl.checked = defaultFeatures.includes(fEl.getAttribute('data-feature'));
                 } else {
                     fEl.checked = false;
@@ -177,21 +220,27 @@ export class DevTwinPanelProvider {
                 catPanel.querySelectorAll('.subcategory').forEach(function(sub) {
                     var subText = sub.textContent.toLowerCase();
                     var subMatch = subText.includes(q);
-                    var anyFeatMatch = false;
-                    sub.querySelectorAll('.feature').forEach(function(feat) {
-                        var featText = feat.textContent.toLowerCase();
-                        var featMatch = featText.includes(q);
-                        feat.style.display = (featMatch || subMatch || catMatch) ? '' : 'none';
-                        if (featMatch) anyFeatMatch = true;
+                    var anyGroupMatch = false;
+                    sub.querySelectorAll('.feature-group').forEach(function(group) {
+                        var groupText = group.textContent.toLowerCase();
+                        var groupMatch = groupText.includes(q);
+                        var anyFeatMatch = false;
+                        group.querySelectorAll('.feature').forEach(function(feat) {
+                            var featText = feat.textContent.toLowerCase();
+                            var featMatch = featText.includes(q);
+                            feat.style.display = (featMatch || groupMatch || subMatch || catMatch) ? '' : 'none';
+                            if (featMatch) anyFeatMatch = true;
+                        });
+                        group.style.display = (groupMatch || subMatch || catMatch || anyFeatMatch) ? '' : 'none';
+                        if (groupMatch || anyFeatMatch) anyGroupMatch = true;
                     });
-                    sub.style.display = (subMatch || catMatch || anyFeatMatch) ? '' : 'none';
-                    if (subMatch || anyFeatMatch) anySubMatch = true;
+                    sub.style.display = (subMatch || catMatch || anyGroupMatch) ? '' : 'none';
+                    if (subMatch || anyGroupMatch) anySubMatch = true;
                 });
                 catPanel.style.display = (catMatch || anySubMatch) ? '' : 'none';
             });
         }
         document.querySelector('.search').addEventListener('input', filterItems);
-        // Remove dependency prompt logic for subcategory selection
         document.querySelectorAll('.subcategory-checkbox').forEach(function(el) {
             el.addEventListener('change', function() {
                 var subId = this.getAttribute('data-subcategory');
@@ -199,7 +248,6 @@ export class DevTwinPanelProvider {
                 setFeatureStates(subId, checked);
             });
         });
-        // On load, set initial feature states
         document.querySelectorAll('.subcategory-checkbox').forEach(function(el) {
             var subId = el.getAttribute('data-subcategory');
             setFeatureStates(subId, el.checked);
@@ -214,7 +262,6 @@ export class DevTwinPanelProvider {
             });
             vscode.postMessage({ command: 'applySelection', data: selected });
         });
-        // On load, ensure clear icon is correct
         filterItems();
         </script>`;
         this.panel.webview.html = html;

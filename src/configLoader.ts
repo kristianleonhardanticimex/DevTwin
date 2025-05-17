@@ -31,7 +31,7 @@ export async function refreshConfig(): Promise<any> {
 }
 
 // Helper to get template content from bundled assets only
-export async function getTemplateContent(_type: 'category' | 'subcategory' | 'feature', id: string): Promise<string> {
+export async function getTemplateContent(_type: 'category' | 'subcategory' | 'featureGroup' | 'feature', id: string): Promise<string> {
     const templatePath = path.join(extensionPath, 'config', 'templates', `${id}.md`);
     if (fs.existsSync(templatePath)) {
         let content = fs.readFileSync(templatePath, 'utf-8');
@@ -47,8 +47,9 @@ export async function getTemplateContent(_type: 'category' | 'subcategory' | 'fe
 
 export async function handleApplySelection(selection: { subcategories: string[]; features: string[] }) {
     const config = await loadConfig();
-    // Find selected categories, subcategories, and features
+    // Find selected categories, subcategories, feature groups, and features
     const selectedSubcats = [];
+    const selectedFeatureGroups = [];
     const selectedFeatures = [];
     let selectedCategoryIds = new Set<string>();
     for (const cat of config.categories) {
@@ -56,25 +57,39 @@ export async function handleApplySelection(selection: { subcategories: string[];
             if (selection.subcategories.includes(sub.id)) {
                 selectedSubcats.push({ ...sub, category: cat });
                 selectedCategoryIds.add(cat.id);
-                for (const feat of sub.features) {
-                    if (selection.features.includes(feat.id)) {
-                        selectedFeatures.push({ ...feat, subcategory: sub, category: cat });
+                if (sub.featureGroups && sub.featureGroups.length > 0) {
+                    for (const group of sub.featureGroups) {
+                        // If any feature in this group is selected, include the group
+                        const groupSelectedFeatures = (group.features || []).filter((feat: any) => selection.features.includes(feat.id));
+                        if (groupSelectedFeatures.length > 0) {
+                            selectedFeatureGroups.push({ ...group, subcategory: sub, category: cat });
+                            for (const feat of groupSelectedFeatures) {
+                                selectedFeatures.push({ ...feat, featureGroup: group, subcategory: sub, category: cat });
+                            }
+                        }
                     }
                 }
             }
         }
     }
-    // Concatenate templates in order: Category > Subcategory > Feature
+    // Concatenate templates in order: Category > Subcategory > Feature Group > Feature
     let output = '';
     for (const catId of selectedCategoryIds) {
+        const cat = config.categories.find((c: any) => c.id === catId);
         const catContent = await getTemplateContent('category', catId);
         output += `<!-- START: ${catId} (Category) -->\n` + catContent + `\n<!-- END: ${catId} -->\n`;
         for (const sub of selectedSubcats.filter(s => s.category.id === catId)) {
             const subContent = await getTemplateContent('subcategory', sub.id);
             output += `<!-- START: ${sub.id} (Subcategory: ${sub.name}) -->\n` + subContent + `\n<!-- END: ${sub.id} -->\n`;
-            for (const feat of selectedFeatures.filter(f => f.subcategory.id === sub.id)) {
-                const featContent = await getTemplateContent('feature', feat.id);
-                output += `<!-- START: ${feat.id} (Feature: ${feat.name}) -->\n` + featContent + `\n<!-- END: ${feat.id} -->\n`;
+            for (const group of selectedFeatureGroups.filter(g => g.subcategory.id === sub.id)) {
+                // Try to load a template for the feature group (optional, fallback to empty if not found)
+                let groupContent = '';
+                try { groupContent = await getTemplateContent('featureGroup', group.id); } catch { groupContent = ''; }
+                output += `<!-- START: ${group.id} (Feature Group: ${group.name}) -->\n` + (groupContent || '') + `\n<!-- END: ${group.id} -->\n`;
+                for (const feat of selectedFeatures.filter(f => f.featureGroup.id === group.id)) {
+                    const featContent = await getTemplateContent('feature', feat.id);
+                    output += `<!-- START: ${feat.id} (Feature: ${feat.name}) -->\n` + featContent + `\n<!-- END: ${feat.id} -->\n`;
+                }
             }
         }
     }

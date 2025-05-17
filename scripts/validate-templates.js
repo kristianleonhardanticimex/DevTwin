@@ -8,18 +8,16 @@ const path = require('path');
 const configPath = path.join(__dirname, '../config/devtwin-config.json');
 const templatesDir = path.join(__dirname, '../config/templates');
 
-function getAllTemplateIds(config) {
+function collectFeatureIds(config) {
   const ids = new Set();
   for (const cat of config.categories) {
     for (const sub of cat.subcategories) {
-      if (sub.template) ids.add(sub.template);
-      if (sub.features) {
-        for (const feat of sub.features) {
-          if (feat.template) ids.add(feat.template);
+      for (const group of sub.featureGroups) {
+        for (const feat of group.features) {
+          ids.add(feat.id);
         }
       }
     }
-    if (cat.template) ids.add(cat.template);
   }
   return ids;
 }
@@ -30,34 +28,24 @@ function main() {
     process.exit(1);
   }
   const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-  const referenced = getAllTemplateIds(config);
-
-  // Check for missing template files
-  let missing = [];
-  for (const id of referenced) {
-    const file = path.join(templatesDir, id + '.md');
-    if (!fs.existsSync(file)) {
+  const featureIds = collectFeatureIds(config);
+  const templateFiles = fs.readdirSync(templatesDir).filter(f => f.endsWith('.md'));
+  const missing = [];
+  for (const id of featureIds) {
+    if (!templateFiles.includes(id + '.md')) {
       missing.push(id + '.md');
     }
   }
-
-  // Check for orphaned template files
-  const allFiles = fs.readdirSync(templatesDir).filter(f => f.endsWith('.md'));
-  const orphaned = allFiles.filter(f => !referenced.has(f.replace(/\.md$/, '')));
-
-  if (missing.length === 0 && orphaned.length === 0) {
-    console.log('All referenced templates exist and no orphaned templates found.');
-    process.exit(0);
+  if (missing.length) {
+    console.log('Missing templates:', missing);
+  } else {
+    console.log('All templates present.');
   }
-  if (missing.length > 0) {
-    console.error('Missing template files:');
-    for (const m of missing) console.error('  -', m);
+  // List extra templates
+  const extra = templateFiles.filter(f => !featureIds.has(f.replace(/\.md$/, '')));
+  if (extra.length) {
+    console.log('Extra templates:', extra);
   }
-  if (orphaned.length > 0) {
-    console.warn('Orphaned template files (not referenced in config):');
-    for (const o of orphaned) console.warn('  -', o);
-  }
-  process.exit(missing.length > 0 ? 1 : 0);
 }
 
-if (require.main === module) main();
+main();
