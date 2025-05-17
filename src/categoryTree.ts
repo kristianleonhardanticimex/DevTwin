@@ -175,6 +175,13 @@ export class DevTwinPanelProvider {
             filterItems();
             search.focus();
         });
+        // Keyboard accessibility for clear button
+        document.querySelector('.clear-icon').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.click();
+            }
+        });
         // Remove dependency prompt logic for subcategory selection
         document.querySelectorAll('.subcategory-checkbox').forEach(function(el) {
             el.addEventListener('change', function() {
