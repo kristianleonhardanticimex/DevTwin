@@ -109,17 +109,23 @@ export class DevTwinPanelProvider {
         `;
         for (const cat of config.categories) {
             html += `<div class='category-panel' data-category='${cat.id}'>`;
-            // Add category header (name and description)
-            html += `<div class='category-header'><span class='category-title'>${cat.name}</span>`;
+            // Category header: title and description stacked vertically, left-aligned
+            html += `<div class='category-header' style='display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 8px;'>`;
+            html += `<span class='category-title'>${cat.name}</span>`;
             if (cat.description) {
-                html += `<div class='category-desc'>${cat.description}</div>`;
+                html += `<span class='category-desc' style='margin-left: 0; margin-bottom: 0;'>${cat.description}</span>`;
             }
             html += `</div>`;
             html += `<div class='category-content' id='content-${cat.id}'>`;
             for (const sub of cat.subcategories) {
                 html += `<div class='subcategory'>`;
+                // Subcategory title and description stacked vertically, left-aligned
+                html += `<div style='display: flex; flex-direction: column; align-items: flex-start;'>`;
                 html += `<vscode-checkbox class='subcategory-checkbox subcategory-title' data-subcategory='${sub.id}' data-recommend='${encodeURIComponent(JSON.stringify(sub.recommendations || []))}'>${sub.name}</vscode-checkbox>`;
-                if (sub.description) { html += `<div class='subcategory-desc'>${sub.description}</div>`; }
+                if (sub.description) {
+                    html += `<span class='subcategory-desc' style='margin-left: 2.2em; margin-bottom: 0;'>${sub.description}</span>`;
+                }
+                html += `</div>`;
                 if (sub.features && sub.features.length > 0) {
                     for (const feat of sub.features) {
                         html += `<div class='feature'><vscode-checkbox class='feature-checkbox' data-feature='${feat.id}' data-parent='${sub.id}' data-recommend='${encodeURIComponent(JSON.stringify(feat.recommendations || []))}'></vscode-checkbox> <span class='feature-desc'><b>${feat.name}</b> - ${feat.description || ''}</span></div>`;
