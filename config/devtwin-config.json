@@ -353,10 +353,12 @@
         {
           "id": "unit-testing",
           "name": "Unit Testing",
+          "description": "Practices and tools for writing and running unit tests.",
           "featureGroups": [
             {
               "id": "dotnet-unit-testing",
               "name": ".NET",
+              "description": "Unit testing frameworks for .NET.",
               "features": [
                 { "id": "xunit", "name": "xUnit", "description": "Microsoft's recommended unit testing framework for .NET." },
                 { "id": "nunit", "name": "NUnit", "description": "Popular alternative unit testing framework for .NET." },
@@ -366,6 +368,7 @@
             {
               "id": "java-unit-testing",
               "name": "Java",
+              "description": "Unit testing frameworks for Java.",
               "features": [
                 { "id": "junit", "name": "JUnit", "description": "Most popular Java unit testing framework." },
                 { "id": "testng", "name": "TestNG", "description": "Powerful Java testing framework." }
@@ -374,6 +377,7 @@
             {
               "id": "js-unit-testing",
               "name": "JavaScript",
+              "description": "Unit testing frameworks for JavaScript.",
               "features": [
                 { "id": "jest", "name": "Jest", "description": "Delightful JavaScript testing framework." },
                 { "id": "mocha", "name": "Mocha", "description": "Flexible JavaScript test framework." },
@@ -383,6 +387,7 @@
             {
               "id": "python-unit-testing",
               "name": "Python",
+              "description": "Unit testing frameworks for Python.",
               "features": [
                 { "id": "pytest", "name": "pytest", "description": "Python's most popular testing framework." }
               ]
@@ -390,6 +395,7 @@
             {
               "id": "go-unit-testing",
               "name": "Go",
+              "description": "Unit testing frameworks for Go.",
               "features": [
                 { "id": "go-test", "name": "Go test", "description": "Built-in Go testing tool." }
               ]
@@ -397,6 +403,7 @@
             {
               "id": "rust-unit-testing",
               "name": "Rust",
+              "description": "Unit testing frameworks for Rust.",
               "features": [
                 { "id": "rust-test", "name": "Rust test", "description": "Built-in Rust testing tool." }
               ]
@@ -406,10 +413,12 @@
         {
           "id": "integration-testing",
           "name": "Integration Testing",
+          "description": "Practices and tools for integration and end-to-end testing.",
           "featureGroups": [
             {
               "id": "integration-tools",
               "name": "Tools",
+              "description": "Tools for integration and end-to-end testing.",
               "features": [
                 { "id": "testcontainers", "name": "TestContainers", "description": "Run test dependencies in containers." },
                 { "id": "playwright", "name": "Playwright", "description": "End-to-end browser testing for modern web apps." },
@@ -422,10 +431,12 @@
         {
           "id": "test-practices",
           "name": "Test Practices",
+          "description": "Patterns and best practices for writing effective tests.",
           "featureGroups": [
             {
               "id": "test-patterns",
               "name": "Patterns",
+              "description": "Common patterns for structuring and organizing tests.",
               "features": [
                 { "id": "arrange-act-assert", "name": "Arrange-Act-Assert Pattern", "description": "Structure tests for clarity." },
                 { "id": "test-data-builders", "name": "Test Data Builders", "description": "Create complex test data easily." },
@@ -514,10 +525,12 @@
         {
           "id": "documentation-practices",
           "name": "Documentation Practices",
+          "description": "Best practices and templates for documenting code and projects.",
           "featureGroups": [
             {
               "id": "doc-templates",
               "name": "Templates",
+              "description": "Templates for project and code documentation.",
               "features": [
                 { "id": "readme-templates", "name": "README.md Templates", "description": "Standardize project documentation." },
                 { "id": "adr", "name": "ADR (Architecture Decision Records)", "description": "Record architectural decisions." }
@@ -526,6 +539,7 @@
             {
               "id": "doc-frameworks",
               "name": "Frameworks",
+              "description": "Frameworks and conventions for code documentation.",
               "features": [
                 { "id": "diataxis", "name": "Diataxis Framework", "description": "Organize documentation by purpose." },
                 { "id": "docstrings-jsdoc-xml", "name": "Docstrings / JSDoc / XML Comments", "description": "Document code for better tooling." }
@@ -536,10 +550,12 @@
         {
           "id": "mcp-integrations",
           "name": "MCP Integrations",
+          "description": "Integrations with Model Context Protocol (MCP) tools and platforms.",
           "featureGroups": [
             {
               "id": "mcp-tools",
               "name": "Tools",
+              "description": "Tools for integrating with MCP and developer portals.",
               "features": [
                 { "id": "github-mcp", "name": "GitHub MCP", "description": "Integrate with GitHub's Model Context Protocol." },
                 { "id": "playwright-mcp", "name": "Playwright MCP", "description": "Integrate Playwright with MCP." },
@@ -704,10 +720,12 @@
         {
           "id": "workflows",
           "name": "Workflows",
+          "description": "Branching and development workflow strategies.",
           "featureGroups": [
             {
               "id": "workflow-strategies",
               "name": "Strategies",
+              "description": "Strategies for managing branches and releases.",
               "features": [
                 { "id": "git-flow", "name": "Git Flow", "description": "Branching model for managing features and releases." },
                 { "id": "github-flow", "name": "GitHub Flow", "description": "Lightweight workflow for continuous delivery." },
@@ -719,10 +737,12 @@
         {
           "id": "versioning",
           "name": "Versioning",
+          "description": "Versioning strategies and commit conventions.",
           "featureGroups": [
             {
               "id": "versioning-group",
               "name": "Versioning",
+              "description": "Approaches for versioning and commit messages.",
               "features": [
                 { "id": "semantic-versioning", "name": "Semantic Versioning", "description": "Use MAJOR.MINOR.PATCH versioning for all projects." },
                 { "id": "conventional-commits", "name": "Conventional Commits", "description": "Use a standard format for commit messages." }
@@ -733,10 +753,12 @@
         {
           "id": "repositories",
           "name": "Repositories",
+          "description": "Repository organization and management strategies.",
           "featureGroups": [
             {
               "id": "repo-strategies",
               "name": "Strategies",
+              "description": "Strategies for organizing code repositories.",
               "features": [
                 { "id": "monorepo-polyrepo", "name": "Monorepo vs Polyrepo", "description": "Choose the right repo strategy for your team." }
               ]
