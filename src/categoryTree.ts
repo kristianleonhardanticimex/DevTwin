@@ -136,7 +136,7 @@ export class DevTwinPanelProvider {
                 html += `<div style='display: flex; flex-direction: column; align-items: flex-start;'>`;
                 html += `<vscode-checkbox class='subcategory-checkbox subcategory-title' data-subcategory='${sub.id}' data-recommend='${encodeURIComponent(JSON.stringify(sub.recommendations || []))}'>${sub.name}</vscode-checkbox>`;
                 if (sub.description) {
-                    html += `<span class='subcategory-desc' style='margin-left: 2.2em; margin-bottom: 0;'>${sub.description}</span>`;
+                    html += `<span class='subcategory-desc' style='margin-left: 2.2em; margin-bottom: 0;'>${sub.description}</span><span style='display:block;height:4px' aria-hidden='true'></span>`;
                 }
                 html += `</div>`;
                 if (sub.features && sub.features.length > 0) {
