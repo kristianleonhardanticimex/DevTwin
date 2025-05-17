@@ -45,8 +45,8 @@ export class DevTwinPanelProvider {
         #header p { color: var(--vscode-descriptionForeground); margin: 0 0 18px 0; font-size: 1.05em; }
         .search { width: 100%; max-width: 700px; margin-bottom: 18px; }
         #content { margin: 0 auto; max-width: 700px; }
-        .category-panel { background: var(--vscode-sideBar-background, #23272e); border-radius: 8px; padding: 0 0 0 0; margin-bottom: 24px; box-shadow: 0 1px 4px 0 rgba(0,0,0,0.07); overflow: hidden; }
-        .category-header { display: flex; align-items: center; cursor: pointer; padding: 18px 18px 12px 18px; background: var(--vscode-editorWidget-background, #23272e); }
+        .category-panel { background: var(--vscode-panel-background, #1e2024); border-radius: 8px; padding: 18px 18px 12px 18px; margin-bottom: 24px; box-shadow: 0 1px 4px 0 rgba(0,0,0,0.07); }
+        .category-header { display: none; }
         .category-title { font-size: 1.15em; font-weight: 600; flex: 1; }
         .category-toggle { font-size: 1.2em; margin-right: 10px; transition: transform 0.2s; }
         .category-toggle.collapsed { transform: rotate(-90deg); }
@@ -71,11 +71,6 @@ export class DevTwinPanelProvider {
         `;
         for (const cat of config.categories) {
             html += `<div class='category-panel' data-category='${cat.id}'>`;
-            html += `<div class='category-header' onclick='toggleCategory("${cat.id}")'>`;
-            html += `<span class='category-toggle' id='toggle-${cat.id}'>▶</span>`;
-            html += `<span class='category-title'>${cat.name}</span>`;
-            html += `</div>`;
-            if (cat.description) { html += `<div class='category-desc'>${cat.description}</div>`; }
             html += `<div class='category-content' id='content-${cat.id}'>`;
             for (const sub of cat.subcategories) {
                 html += `<div class='subcategory'>`;
@@ -94,19 +89,6 @@ export class DevTwinPanelProvider {
         html += `<script type='module'>
         const vscode = acquireVsCodeApi();
         const config = ${JSON.stringify(config)};
-        // --- Collapsible category logic ---
-        function toggleCategory(catId) {
-            const content = document.getElementById('content-' + catId);
-            const toggle = document.getElementById('toggle-' + catId);
-            if (content.classList.contains('collapsed')) {
-                content.classList.remove('collapsed');
-                toggle.classList.remove('collapsed');
-            } else {
-                content.classList.add('collapsed');
-                toggle.classList.add('collapsed');
-            }
-        }
-        // --- End collapsible logic ---
         // --- Feature/subcategory logic ---
         function setFeatureStates(subId, checked) {
             // Find subcategory config
@@ -158,15 +140,6 @@ export class DevTwinPanelProvider {
         document.querySelectorAll('.subcategory-checkbox').forEach(function(el) {
             var subId = el.getAttribute('data-subcategory');
             setFeatureStates(subId, el.checked);
-        });
-        document.querySelectorAll('.category-header').forEach(function(header) {
-            header.addEventListener('click', function() {
-                const panel = this.parentElement;
-                const content = panel.querySelector('.category-content');
-                const toggle = panel.querySelector('.category-toggle');
-                const isCollapsed = content.classList.toggle('collapsed');
-                toggle.classList.toggle('collapsed', isCollapsed);
-            });
         });
         document.getElementById('applySelection').addEventListener('click', function() {
             var selected = { subcategories: [], features: [] };
