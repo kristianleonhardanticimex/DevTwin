@@ -364,12 +364,6 @@ export class DevTwinPanelProvider {
               }
             });
           });
-          // Listen for toast and refresh
-          window.addEventListener('message', function(event) {
-            if (event.data && event.data.toast) {
-              vscode.postMessage({ command: 'refreshWebview' });
-            }
-          });
         })();
         </script>`;
         this.panel.webview.html = html;

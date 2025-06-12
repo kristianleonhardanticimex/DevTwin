@@ -1,7 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { refreshConfig, setExtensionPath, handleApplySubcategory, handleRemoveSubcategory, handleApplyFeature, handleRemoveFeature } from './configLoader';
+import { refreshConfig, setExtensionPath } from './configLoader';
 import { DevTwinPanelProvider } from './categoryTree';
 
 let devTwinPanelProvider: DevTwinPanelProvider | undefined;
@@ -45,28 +45,42 @@ export function activate(context: vscode.ExtensionContext) {
 			const webviewPanel = panelProvider.getWebviewPanel();
 			if (webviewPanel) {
 				webviewPanel.webview.onDidReceiveMessage(async (message) => {
+					const { loadConfig, handleApplySubcategory, handleRemoveSubcategory, handleApplyFeature, handleRemoveFeature } = require('./configLoader');
+					const config = await loadConfig();
 					if (message.command === 'applySelection') {
 						const { handleApplySelection } = require('./configLoader');
 						await handleApplySelection(message.data);
 					} else if (message.command === 'applySubcategory') {
-						const { handleApplySubcategory } = require('./configLoader');
-						await handleApplySubcategory(message.id);
-						panelProvider.postMessageToWebview({ toast: 'Subcategory applied.' });
+						const sub = (config.categories.flatMap((c: any) => c.subcategories).find((s: any) => s.id === message.id));
+						await handleApplySubcategory(message.id, sub ? `DevTwin: Added ${sub.name} to copilot-instructions.md` : 'DevTwin: Subcategory applied.');
 						await panelProvider.updateWebview();
 					} else if (message.command === 'removeSubcategory') {
-						const { handleRemoveSubcategory } = require('./configLoader');
-						await handleRemoveSubcategory(message.id);
-						panelProvider.postMessageToWebview({ toast: 'Subcategory removed.' });
+						const sub = (config.categories.flatMap((c: any) => c.subcategories).find((s: any) => s.id === message.id));
+						await handleRemoveSubcategory(message.id, sub ? `DevTwin: Removed ${sub.name} from copilot-instructions.md` : 'DevTwin: Subcategory removed.');
 						await panelProvider.updateWebview();
 					} else if (message.command === 'applyFeature') {
-						const { handleApplyFeature } = require('./configLoader');
-						await handleApplyFeature(message.id, message.parent);
-						panelProvider.postMessageToWebview({ toast: 'Feature applied!' });
+						let featName = message.id;
+						for (const c of config.categories) {
+							for (const s of c.subcategories) {
+								for (const g of s.featureGroups || []) {
+									const f = (g.features || []).find((f: any) => f.id === message.id);
+									if (f) { featName = f.name; break; }
+								}
+							}
+						}
+						await handleApplyFeature(message.id, message.parent, `DevTwin: Added ${featName} to copilot-instructions.md`);
 						await panelProvider.updateWebview();
 					} else if (message.command === 'removeFeature') {
-						const { handleRemoveFeature } = require('./configLoader');
-						await handleRemoveFeature(message.id);
-						panelProvider.postMessageToWebview({ toast: 'Feature removed.' });
+						let featName = message.id;
+						for (const c of config.categories) {
+							for (const s of c.subcategories) {
+								for (const g of s.featureGroups || []) {
+									const f = (g.features || []).find((f: any) => f.id === message.id);
+									if (f) { featName = f.name; break; }
+								}
+							}
+						}
+						await handleRemoveFeature(message.id, `DevTwin: Removed ${featName} from copilot-instructions.md`);
 						await panelProvider.updateWebview();
 					} else if (message.command === 'refreshWebview') {
 						await panelProvider.updateWebview();

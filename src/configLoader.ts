@@ -53,7 +53,8 @@ export function getSelectionState() {
 }
 
 // Patch handleApplySelection to update currentSelection
-export async function handleApplySelection(selection: { subcategories: string[]; features: string[] }) {
+// Accept a toast message and show it as a VS Code notification
+export async function handleApplySelection(selection: { subcategories: string[]; features: string[] }, toast?: string) {
     currentSelection = selection;
     const config = await loadConfig();
     // Find selected categories, subcategories, feature groups, and features
@@ -110,11 +111,9 @@ export async function handleApplySelection(selection: { subcategories: string[];
         const bakFile = path.join(githubDir, 'copilot-instructions.bak.md');
         if (fs.existsSync(outFile)) { fs.copyFileSync(outFile, bakFile); }
         fs.writeFileSync(outFile, output, 'utf-8');
-        vscode.window.showInformationMessage('.github/copilot-instructions.md generated!', 'Open File').then(selection => {
-            if (selection === 'Open File') {
-                vscode.window.showTextDocument(vscode.Uri.file(outFile));
-            }
-        });
+        if (toast) {
+            vscode.window.showInformationMessage(toast);
+        }
     } catch (err: any) {
         vscode.window.showErrorMessage('Failed to generate .github/copilot-instructions.md: ' + (err && err.message ? err.message : String(err)));
     }
@@ -163,99 +162,102 @@ export async function loadCopilotInstructions(): Promise<{ blocks: Record<string
 }
 
 // --- Immediate apply/remove for subcategory/feature ---
-export async function handleApplySubcategory(subcategoryId: string) {
+export async function handleApplySubcategory(subcategoryId: string, toast?: string) {
     // Find all features for this subcategory and apply all defaultFeatures
-    const config = await loadConfig();
-    let sub, cat;
-    for (const c of config.categories) {
+    const configLocal = await loadConfig();
+    let subLocal, catLocal;
+    for (const c of configLocal.categories) {
         for (const s of c.subcategories) {
-            if (s.id === subcategoryId) { sub = s; cat = c; break; }
+            if (s.id === subcategoryId) { subLocal = s; catLocal = c; break; }
         }
     }
-    if (!sub || !cat) { return; }
+    if (!subLocal || !catLocal) { return; }
     // Gather all default features for this subcategory
-    const defaultFeatures = sub.defaultFeatures || [];
-    const selection = { subcategories: [sub.id], features: defaultFeatures };
+    const defaultFeatures = subLocal.defaultFeatures || [];
+    const selection = { subcategories: [subLocal.id], features: defaultFeatures };
     currentSelection = selection;
-    await handleApplySelection(selection);
+    await handleApplySelection(selection, toast);
 }
 
-export async function handleRemoveSubcategory(subcategoryId: string) {
+export async function handleRemoveSubcategory(subcategoryId: string, toast?: string) {
     // Remove subcategory and all its features from copilot-instructions.md
     // (For simplicity, just remove the subcategory block and all its feature blocks)
-    const config = await loadConfig();
-    let sub, cat;
-    for (const c of config.categories) {
+    const configLocal = await loadConfig();
+    let subLocal, catLocal;
+    for (const c of configLocal.categories) {
         for (const s of c.subcategories) {
-            if (s.id === subcategoryId) { sub = s; cat = c; break; }
+            if (s.id === subcategoryId) { subLocal = s; catLocal = c; break; }
         }
     }
-    if (!sub || !cat) { return; }
+    if (!subLocal || !catLocal) { return; }
     // Remove subcategory block and all its features
     const githubDir = path.join(extensionPath, '.github');
     const outFile = path.join(githubDir, 'copilot-instructions.md');
     if (!fs.existsSync(outFile)) { return; }
     let content = fs.readFileSync(outFile, 'utf-8');
     // Remove subcategory block
-    const subBlockRegex = new RegExp(`<!-- START: ${sub.id} [^>]+-->[\s\S]*?<!-- END: ${sub.id} -->\n?`, 'g');
+    const subBlockRegex = new RegExp(`<!-- START: ${subLocal.id} [^>]+-->[\s\S]*?<!-- END: ${subLocal.id} -->\n?`, 'g');
     content = content.replace(subBlockRegex, '');
     // Remove all feature blocks under this subcategory
-    if (sub.featureGroups) {
-        for (const group of sub.featureGroups) {
+    if (subLocal.featureGroups) {
+        for (const group of subLocal.featureGroups) {
             for (const feat of group.features || []) {
                 const featBlockRegex = new RegExp(`<!-- START: ${feat.id} [^>]+-->[\s\S]*?<!-- END: ${feat.id} -->\n?`, 'g');
                 content = content.replace(featBlockRegex, '');
             }
         }
     }
+    fs.writeFileSync(outFile, content, 'utf-8');
     // Remove subcategory and all its features from selection
     currentSelection.subcategories = currentSelection.subcategories.filter(id => id !== subcategoryId);
-    // Remove all features under this subcategory
-    if (sub && sub.featureGroups) {
-        for (const group of sub.featureGroups) {
+    if (subLocal && subLocal.featureGroups) {
+        for (const group of subLocal.featureGroups) {
             for (const feat of group.features || []) {
                 currentSelection.features = currentSelection.features.filter(fid => fid !== feat.id);
             }
         }
     }
-    fs.writeFileSync(outFile, content, 'utf-8');
+    if (toast) {
+        vscode.window.showInformationMessage(toast);
+    }
 }
 
-export async function handleApplyFeature(featureId: string, parentSubId: string) {
+export async function handleApplyFeature(featureId: string, parentSubId: string, toast?: string) {
     // Add only the feature block for this feature
-    const config = await loadConfig();
-    let feat, sub, cat, group;
-    for (const c of config.categories) {
+    const configLocal = await loadConfig();
+    let featLocal, subLocal, catLocal, groupLocal;
+    for (const c of configLocal.categories) {
         for (const s of c.subcategories) {
             for (const g of s.featureGroups || []) {
                 for (const f of g.features || []) {
-                    if (f.id === featureId) { feat = f; sub = s; cat = c; group = g; break; }
+                    if (f.id === featureId) { featLocal = f; subLocal = s; catLocal = c; groupLocal = g; break; }
                 }
             }
         }
     }
-    if (!feat || !sub || !cat) { return; }
+    if (!featLocal || !subLocal || !catLocal) { return; }
     // Compose a selection with just this feature
-    const selection = { subcategories: [sub.id], features: [feat.id] };
-    // Add feature to selection
-    if (!currentSelection.subcategories.includes(parentSubId)) {
-        currentSelection.subcategories.push(parentSubId);
+    if (!currentSelection.subcategories.includes(subLocal.id)) {
+        currentSelection.subcategories.push(subLocal.id);
     }
-    if (!currentSelection.features.includes(featureId)) {
-        currentSelection.features.push(featureId);
+    if (!currentSelection.features.includes(featLocal.id)) {
+        currentSelection.features.push(featLocal.id);
     }
-    await handleApplySelection({ subcategories: currentSelection.subcategories, features: currentSelection.features });
+    await handleApplySelection({ subcategories: currentSelection.subcategories, features: currentSelection.features }, toast);
 }
 
-export async function handleRemoveFeature(featureId: string) {
+export async function handleRemoveFeature(featureId: string, toast?: string) {
     // Remove only the feature block for this feature
-    const githubDir = path.join(extensionPath, '.github');
-    const outFile = path.join(githubDir, 'copilot-instructions.md');
-    if (!fs.existsSync(outFile)) { return; }
-    let content = fs.readFileSync(outFile, 'utf-8');
+    const githubDir2 = path.join(extensionPath, '.github');
+    const outFile2 = path.join(githubDir2, 'copilot-instructions.md');
+    if (!fs.existsSync(outFile2)) { return; }
+    let content = fs.readFileSync(outFile2, 'utf-8');
     const featBlockRegex = new RegExp(`<!-- START: ${featureId} [^>]+-->[\s\S]*?<!-- END: ${featureId} -->\n?`, 'g');
     content = content.replace(featBlockRegex, '');
+    fs.writeFileSync(outFile2, content, 'utf-8');
     // Remove feature from selection
     currentSelection.features = currentSelection.features.filter(fid => fid !== featureId);
-    fs.writeFileSync(outFile, content, 'utf-8');
+    if (toast) {
+        vscode.window.showInformationMessage(toast);
+    }
 }
