@@ -1,7 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { refreshConfig, setExtensionPath } from './configLoader';
+import { refreshConfig, setExtensionPath, handleApplySubcategory, handleRemoveSubcategory, handleApplyFeature, handleRemoveFeature } from './configLoader';
 import { DevTwinPanelProvider } from './categoryTree';
 
 let devTwinPanelProvider: DevTwinPanelProvider | undefined;
@@ -42,6 +42,37 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('devtwin.openPanel', async () => {
 			const panelProvider = new DevTwinPanelProvider(context);
 			await panelProvider.showPanel();
+			const webviewPanel = panelProvider.getWebviewPanel();
+			if (webviewPanel) {
+				webviewPanel.webview.onDidReceiveMessage(async (message) => {
+					if (message.command === 'applySelection') {
+						const { handleApplySelection } = require('./configLoader');
+						await handleApplySelection(message.data);
+					} else if (message.command === 'applySubcategory') {
+						const { handleApplySubcategory } = require('./configLoader');
+						await handleApplySubcategory(message.id);
+						panelProvider.postMessageToWebview({ toast: 'Subcategory applied.' });
+						await panelProvider.updateWebview();
+					} else if (message.command === 'removeSubcategory') {
+						const { handleRemoveSubcategory } = require('./configLoader');
+						await handleRemoveSubcategory(message.id);
+						panelProvider.postMessageToWebview({ toast: 'Subcategory removed.' });
+						await panelProvider.updateWebview();
+					} else if (message.command === 'applyFeature') {
+						const { handleApplyFeature } = require('./configLoader');
+						await handleApplyFeature(message.id, message.parent);
+						panelProvider.postMessageToWebview({ toast: 'Feature applied!' });
+						await panelProvider.updateWebview();
+					} else if (message.command === 'removeFeature') {
+						const { handleRemoveFeature } = require('./configLoader');
+						await handleRemoveFeature(message.id);
+						panelProvider.postMessageToWebview({ toast: 'Feature removed.' });
+						await panelProvider.updateWebview();
+					} else if (message.command === 'refreshWebview') {
+						await panelProvider.updateWebview();
+					}
+				});
+			}
 		})
 	);
 }

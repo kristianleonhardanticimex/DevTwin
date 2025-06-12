@@ -45,7 +45,16 @@ export async function getTemplateContent(_type: 'category' | 'subcategory' | 'fe
     return `\n<!-- MISSING TEMPLATE: ${id}.md -->\n`;
 }
 
+// --- Selection state persistence ---
+let currentSelection: { subcategories: string[]; features: string[] } = { subcategories: [], features: [] };
+
+export function getSelectionState() {
+    return currentSelection;
+}
+
+// Patch handleApplySelection to update currentSelection
 export async function handleApplySelection(selection: { subcategories: string[]; features: string[] }) {
+    currentSelection = selection;
     const config = await loadConfig();
     // Find selected categories, subcategories, feature groups, and features
     const selectedSubcats = [];
@@ -151,4 +160,102 @@ export async function loadCopilotInstructions(): Promise<{ blocks: Record<string
         }
     }
     return { blocks, warnings };
+}
+
+// --- Immediate apply/remove for subcategory/feature ---
+export async function handleApplySubcategory(subcategoryId: string) {
+    // Find all features for this subcategory and apply all defaultFeatures
+    const config = await loadConfig();
+    let sub, cat;
+    for (const c of config.categories) {
+        for (const s of c.subcategories) {
+            if (s.id === subcategoryId) { sub = s; cat = c; break; }
+        }
+    }
+    if (!sub || !cat) { return; }
+    // Gather all default features for this subcategory
+    const defaultFeatures = sub.defaultFeatures || [];
+    const selection = { subcategories: [sub.id], features: defaultFeatures };
+    currentSelection = selection;
+    await handleApplySelection(selection);
+}
+
+export async function handleRemoveSubcategory(subcategoryId: string) {
+    // Remove subcategory and all its features from copilot-instructions.md
+    // (For simplicity, just remove the subcategory block and all its feature blocks)
+    const config = await loadConfig();
+    let sub, cat;
+    for (const c of config.categories) {
+        for (const s of c.subcategories) {
+            if (s.id === subcategoryId) { sub = s; cat = c; break; }
+        }
+    }
+    if (!sub || !cat) { return; }
+    // Remove subcategory block and all its features
+    const githubDir = path.join(extensionPath, '.github');
+    const outFile = path.join(githubDir, 'copilot-instructions.md');
+    if (!fs.existsSync(outFile)) { return; }
+    let content = fs.readFileSync(outFile, 'utf-8');
+    // Remove subcategory block
+    const subBlockRegex = new RegExp(`<!-- START: ${sub.id} [^>]+-->[\s\S]*?<!-- END: ${sub.id} -->\n?`, 'g');
+    content = content.replace(subBlockRegex, '');
+    // Remove all feature blocks under this subcategory
+    if (sub.featureGroups) {
+        for (const group of sub.featureGroups) {
+            for (const feat of group.features || []) {
+                const featBlockRegex = new RegExp(`<!-- START: ${feat.id} [^>]+-->[\s\S]*?<!-- END: ${feat.id} -->\n?`, 'g');
+                content = content.replace(featBlockRegex, '');
+            }
+        }
+    }
+    // Remove subcategory and all its features from selection
+    currentSelection.subcategories = currentSelection.subcategories.filter(id => id !== subcategoryId);
+    // Remove all features under this subcategory
+    if (sub && sub.featureGroups) {
+        for (const group of sub.featureGroups) {
+            for (const feat of group.features || []) {
+                currentSelection.features = currentSelection.features.filter(fid => fid !== feat.id);
+            }
+        }
+    }
+    fs.writeFileSync(outFile, content, 'utf-8');
+}
+
+export async function handleApplyFeature(featureId: string, parentSubId: string) {
+    // Add only the feature block for this feature
+    const config = await loadConfig();
+    let feat, sub, cat, group;
+    for (const c of config.categories) {
+        for (const s of c.subcategories) {
+            for (const g of s.featureGroups || []) {
+                for (const f of g.features || []) {
+                    if (f.id === featureId) { feat = f; sub = s; cat = c; group = g; break; }
+                }
+            }
+        }
+    }
+    if (!feat || !sub || !cat) { return; }
+    // Compose a selection with just this feature
+    const selection = { subcategories: [sub.id], features: [feat.id] };
+    // Add feature to selection
+    if (!currentSelection.subcategories.includes(parentSubId)) {
+        currentSelection.subcategories.push(parentSubId);
+    }
+    if (!currentSelection.features.includes(featureId)) {
+        currentSelection.features.push(featureId);
+    }
+    await handleApplySelection({ subcategories: currentSelection.subcategories, features: currentSelection.features });
+}
+
+export async function handleRemoveFeature(featureId: string) {
+    // Remove only the feature block for this feature
+    const githubDir = path.join(extensionPath, '.github');
+    const outFile = path.join(githubDir, 'copilot-instructions.md');
+    if (!fs.existsSync(outFile)) { return; }
+    let content = fs.readFileSync(outFile, 'utf-8');
+    const featBlockRegex = new RegExp(`<!-- START: ${featureId} [^>]+-->[\s\S]*?<!-- END: ${featureId} -->\n?`, 'g');
+    content = content.replace(featBlockRegex, '');
+    // Remove feature from selection
+    currentSelection.features = currentSelection.features.filter(fid => fid !== featureId);
+    fs.writeFileSync(outFile, content, 'utf-8');
 }

@@ -32,6 +32,16 @@ export class DevTwinPanelProvider {
         }
     }
 
+    public getWebviewPanel(): vscode.WebviewPanel | undefined {
+        return this.panel;
+    }
+
+    public postMessageToWebview(message: any) {
+        if (this.panel) {
+            this.panel.webview.postMessage(message);
+        }
+    }
+
     public async updateWebview() {
         if (!this.panel) { return; }
         const config = await loadConfig();
@@ -167,6 +177,9 @@ export class DevTwinPanelProvider {
           <div id='recommend-banner' style='display:none'></div>
           <div id='content'>
         `;
+        // Get selection state from backend
+        const { getSelectionState } = require('./configLoader');
+        const selection = getSelectionState ? getSelectionState() : { subcategories: [], features: [] };
         for (const cat of config.categories) {
           html += `<div class='category'>`;
           html += `<div class='category-title'>${cat.name}</div>`;
@@ -174,18 +187,15 @@ export class DevTwinPanelProvider {
             html += `<div class='category-desc'>${cat.description}</div>`;
           }
           for (const sub of cat.subcategories) {
+            const subChecked = selection.subcategories && selection.subcategories.includes(sub.id);
             html += `<div class='subcategory'>`;
-            html += `<div class='subcategory-header' style='display: flex; align-items: flex-start;'>`;
-            const isChecked = (sub.defaultSelected === true || (Array.isArray(sub.defaultFeatures) && sub.defaultFeatures.length > 0)) ? 'checked' : '';
-            html += `<vscode-checkbox class='subcategory-checkbox' data-subcategory='${sub.id}' data-recommend='${encodeURIComponent(JSON.stringify(sub.recommendations || []))}' ${isChecked}></vscode-checkbox>`;
-            html += `<div style='display: flex; flex-direction: column;'>`;
+            html += `<div class='subcategory-header' style='display: flex; align-items: center;'>`;
+            html += `<input type='checkbox' class='subcategory-checkbox' data-category='${sub.id}' ${subChecked ? 'checked' : ''}/>`;
             html += `<span class='subcategory-title'>${sub.name}</span>`;
+            html += `</div>`;
             if (sub.description) {
               html += `<div class='subcategory-desc'>${sub.description}</div>`;
             }
-            html += `</div>`;
-            html += `<span class='info-icon' data-type='subcategory' data-id='${sub.id}' title='More info' style='margin-left:6px;cursor:pointer;'><i class='fa fa-info-circle'></i></span>`;
-            html += `</div>`;
             if (sub.featureGroups && sub.featureGroups.length > 0) {
               for (const group of sub.featureGroups) {
                 html += `<div class='feature-group'>`;
@@ -196,16 +206,16 @@ export class DevTwinPanelProvider {
                 if (group.features && group.features.length > 0) {
                   html += `<div class='feature-list'>`;
                   for (const feat of group.features) {
-                    html += `<div class='feature'>`;
-                    html += `<vscode-checkbox class='feature-checkbox' data-feature='${feat.id}' data-parent='${sub.id}' data-group='${group.id}' data-recommend='${encodeURIComponent(JSON.stringify(feat.recommendations || []))}'></vscode-checkbox>`;
-                    let tagsHtml = '';
-                    if (feat.tags && Array.isArray(feat.tags)) {
-                      for (const tag of feat.tags) {
-                        tagsHtml += `<span class='feature-tag' style='background:${tag.color};color:#fff;border-radius:4px;padding:2px 7px;font-size:1.1em;margin-right:7px;vertical-align:middle;display:inline-flex;align-items:center;gap:4px;cursor:${tag.url ? 'pointer' : 'default'};' ${tag.url ? `onclick=\"window.open('${tag.url}','_blank')\"` : ''} title='This feature requires an external tool'><i class='fa fa-wrench'></i></span>`;
-                      }
+                    // If subcategory is not checked, feature must be unchecked and disabled
+                    let featChecked = false;
+                    let featDisabled = 'disabled';
+                    if (subChecked) {
+                      featChecked = selection.features && selection.features.includes(feat.id);
+                      featDisabled = '';
                     }
-                    html += `<span class='feature-desc'>${tagsHtml}<b>${feat.name}</b>${feat.description ? ' - ' + feat.description : ''}</span>`;
-                    html += `<span class='info-icon' data-type='feature' data-id='${feat.id}' title='More info' style='margin-left:6px;cursor:pointer;'><i class='fa fa-info-circle'></i></span>`;
+                    html += `<div class='feature'>`;
+                    html += `<input type='checkbox' class='feature-checkbox instruction-checkbox' data-instruction='${feat.id}' data-parent='${sub.id}' ${featChecked ? 'checked' : ''} ${featDisabled}/>`;
+                    html += `<span class='feature-desc'><b>${feat.name}</b>${feat.description ? ' - ' + feat.description : ''}</span>`;
                     html += `</div>`;
                   }
                   html += `</div>`;
@@ -217,7 +227,7 @@ export class DevTwinPanelProvider {
           }
           html += `</div>`;
         }
-        html += `</div><vscode-button id='applySelection'>Apply Selection</vscode-button>`;
+        html += `</div>`;
         html += `
 <div id='info-dialog' style='display:none;position:fixed;z-index:9999;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);align-items:center;justify-content:center;'>
   <div id='info-dialog-content' style='background:#222;color:#fff;max-width:600px;width:90vw;min-width:320px;min-height:120px;padding:32px 28px 18px 28px;border-radius:10px;box-shadow:0 8px 32px #000a;position:absolute;top:20vh;left:calc(50vw - 300px);resize:both;overflow:auto;cursor:move;'>
@@ -326,6 +336,40 @@ export class DevTwinPanelProvider {
           document.getElementById('info-dialog').onclick = function(e) {
             if (e.target === this) this.style.display = 'none';
           };
+        })();
+        </script>`;
+        html += `<script>
+        (function() {
+          var vscode = acquireVsCodeApi();
+          // Subcategory checkbox event
+          document.querySelectorAll('.subcategory-checkbox').forEach(function(cb) {
+            cb.addEventListener('change', function(e) {
+              var subId = this.getAttribute('data-category');
+              if (this.checked) {
+                vscode.postMessage({ command: 'applySubcategory', id: subId });
+              } else {
+                vscode.postMessage({ command: 'removeSubcategory', id: subId });
+              }
+            });
+          });
+          // Feature checkbox event
+          document.querySelectorAll('.feature-checkbox').forEach(function(cb) {
+            cb.addEventListener('change', function(e) {
+              var featId = this.getAttribute('data-instruction');
+              var parentSub = this.getAttribute('data-parent');
+              if (this.checked) {
+                vscode.postMessage({ command: 'applyFeature', id: featId, parent: parentSub });
+              } else {
+                vscode.postMessage({ command: 'removeFeature', id: featId, parent: parentSub });
+              }
+            });
+          });
+          // Listen for toast and refresh
+          window.addEventListener('message', function(event) {
+            if (event.data && event.data.toast) {
+              vscode.postMessage({ command: 'refreshWebview' });
+            }
+          });
         })();
         </script>`;
         this.panel.webview.html = html;
