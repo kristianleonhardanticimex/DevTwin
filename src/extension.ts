@@ -40,9 +40,8 @@ export function activate(context: vscode.ExtensionContext) {
 	devTwinPanelProvider = new DevTwinPanelProvider(context);
 	context.subscriptions.push(
 		vscode.commands.registerCommand('devtwin.openPanel', async () => {
-			if (devTwinPanelProvider) {
-				await devTwinPanelProvider.showPanel();
-			}
+			const panelProvider = new DevTwinPanelProvider(context);
+			await panelProvider.showPanel();
 		})
 	);
 }

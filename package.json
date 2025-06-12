@@ -18,7 +18,8 @@
     "commands": [
       {
         "command": "devtwin.openPanel",
-        "title": "DevTwin: Open Instruction Builder"
+        "title": "Open DevTwin Instruction Builder",
+        "category": "DevTwin"
       },
       {
         "command": "devtwin.refreshConfig",
@@ -28,7 +29,17 @@
         "command": "devtwin-copilot-instruction-builder.helloWorld",
         "title": "Hello World from DevTwin Copilot Instruction Builder!"
       }
-    ]
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "devtwin.openPanel",
+          "when": "resourceFilename == copilot-instructions.md",
+          "group": "navigation@1",
+          "title": "Open DevTwin Instruction Builder"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
