@@ -20,7 +20,23 @@ export function setExtensionPath(context: vscode.ExtensionContext) {
     }
 }
 
+// --- In-memory cache for config and templates ---
+let cachedConfig: any = null;
+let cachedTemplates: Record<string, string> = {};
+
+export function clearDevTwinCache() {
+    cachedConfig = null;
+    cachedTemplates = {};
+    if (devtwinOutputChannel) {
+        devtwinOutputChannel.appendLine('[DevTwin] DevTwin cache cleared.');
+    }
+}
+
 export async function loadConfig(): Promise<any> {
+    if (cachedConfig) {
+        if (devtwinOutputChannel) { devtwinOutputChannel.appendLine('[DevTwin] Returning cached config.'); }
+        return cachedConfig;
+    }
     if (!extensionContext) {
         throw new Error('DevTwin: Extension context not set.');
     }
@@ -30,7 +46,8 @@ export async function loadConfig(): Promise<any> {
     }
     if (fs.existsSync(configPath)) {
         const data = fs.readFileSync(configPath, 'utf-8');
-        return JSON.parse(data);
+        cachedConfig = JSON.parse(data);
+        return cachedConfig;
     } else {
         vscode.window.showErrorMessage('DevTwin: config/devtwin-config.json not found in extension.');
         throw new Error('DevTwin: config/devtwin-config.json not found in extension.');
@@ -38,6 +55,9 @@ export async function loadConfig(): Promise<any> {
 }
 
 export async function getTemplateContent(_type: 'category' | 'subcategory' | 'featureGroup' | 'feature', id: string): Promise<string> {
+    if (cachedTemplates[id]) {
+        return cachedTemplates[id];
+    }
     if (!extensionContext) {
         throw new Error('DevTwin: Extension context not set.');
     }
@@ -48,10 +68,13 @@ export async function getTemplateContent(_type: 'category' | 'subcategory' | 'fe
                          .replace(/<!-- END:[\s\S]*?-->/g, '')
                          .replace(/<!--([\s\S]*?)-->/g, '')
                          .replace(/^\s+|\s+$/g, '');
-        return content + '\n';
+        cachedTemplates[id] = content + '\n';
+        return cachedTemplates[id];
     }
     // If missing, return a clear warning block
-    return `\n<!-- MISSING TEMPLATE: ${id}.md -->\n`;
+    const missing = `\n<!-- MISSING TEMPLATE: ${id}.md -->\n`;
+    cachedTemplates[id] = missing;
+    return missing;
 }
 
 // --- Selection state persistence ---
