@@ -1,6 +1,9 @@
 import * as vscode from 'vscode';
 import { loadConfig } from './configLoader';
 
+// Move configLoader require to the top for performance
+const configLoader = require('./configLoader');
+
 export class DevTwinPanelProvider {
     public static readonly viewType = 'devtwin.panel';
     private panel: vscode.WebviewPanel | undefined;
@@ -23,26 +26,21 @@ export class DevTwinPanelProvider {
             this.panel.webview.onDidReceiveMessage(async (message) => {
                 try {
                     if (message.command === 'applySelection') {
-                        const { handleApplySelection } = require('./configLoader');
-                        await handleApplySelection(message.data);
+                        await configLoader.handleApplySelection(message.data);
                     } else if (message.command === 'applySubcategory') {
-                        const { handleApplySubcategory } = require('./configLoader');
                         this.logToWebview('applySubcategory: ' + message.id);
-                        await handleApplySubcategory(message.id);
+                        await configLoader.handleApplySubcategory(message.id);
                         await this.updateWebview();
                     } else if (message.command === 'removeSubcategory') {
-                        const { handleRemoveSubcategory } = require('./configLoader');
                         this.logToWebview('removeSubcategory: ' + message.id);
-                        await handleRemoveSubcategory(message.id);
+                        await configLoader.handleRemoveSubcategory(message.id);
                         await this.updateWebview();
                     } else if (message.command === 'applyFeature') {
-                        const { handleApplyFeature } = require('./configLoader');
                         this.logToWebview('applyFeature: ' + message.id + ' parent: ' + message.parent);
-                        await handleApplyFeature(message.id, message.parent);
+                        await configLoader.handleApplyFeature(message.id, message.parent);
                     } else if (message.command === 'removeFeature') {
-                        const { handleRemoveFeature } = require('./configLoader');
                         this.logToWebview('removeFeature: ' + message.id + ' parent: ' + message.parent);
-                        await handleRemoveFeature(message.id, message.parent);
+                        await configLoader.handleRemoveFeature(message.id, message.parent);
                     } else if (message.command === 'refreshPanel') {
                         this.logToWebview('refreshPanel');
                         await this.updateWebview();
