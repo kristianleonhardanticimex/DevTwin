@@ -3,36 +3,45 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
-let extensionPath: string = '';
+function getWorkspaceRoot(): string {
+    if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
+        return vscode.workspace.workspaceFolders[0].uri.fsPath;
+    }
+    throw new Error('DevTwin: No workspace folder open.');
+}
+
+let devtwinOutputChannel: vscode.OutputChannel | undefined;
+let extensionContext: vscode.ExtensionContext | undefined;
+
 export function setExtensionPath(context: vscode.ExtensionContext) {
-    extensionPath = context.extensionPath;
+    extensionContext = context;
+    if (!devtwinOutputChannel) {
+        devtwinOutputChannel = vscode.window.createOutputChannel('DevTwin');
+    }
 }
 
 export async function loadConfig(): Promise<any> {
-    // Always load config from the extension's bundled assets
-    const configPath = path.join(extensionPath, 'config', 'devtwin-config.json');
+    if (!extensionContext) {
+        throw new Error('DevTwin: Extension context not set.');
+    }
+    const configPath = path.join(extensionContext.extensionPath, 'config', 'devtwin-config.json');
+    if (devtwinOutputChannel) {
+        devtwinOutputChannel.appendLine('[DevTwin] Loading config from extension: ' + configPath);
+    }
     if (fs.existsSync(configPath)) {
         const data = fs.readFileSync(configPath, 'utf-8');
         return JSON.parse(data);
     } else {
-        vscode.window.showErrorMessage('Bundled config file not found: ' + configPath);
-        throw new Error('Bundled config file not found');
+        vscode.window.showErrorMessage('DevTwin: config/devtwin-config.json not found in extension.');
+        throw new Error('DevTwin: config/devtwin-config.json not found in extension.');
     }
 }
 
-export async function cacheConfig(_json: any) {
-    // No-op: caching not needed for bundled config
-}
-
-export async function refreshConfig(): Promise<any> {
-    // No-op: always use bundled config
-    vscode.window.showInformationMessage('DevTwin config reloaded from bundled assets.');
-    return loadConfig();
-}
-
-// Helper to get template content from bundled assets only
 export async function getTemplateContent(_type: 'category' | 'subcategory' | 'featureGroup' | 'feature', id: string): Promise<string> {
-    const templatePath = path.join(extensionPath, 'config', 'templates', `${id}.md`);
+    if (!extensionContext) {
+        throw new Error('DevTwin: Extension context not set.');
+    }
+    const templatePath = path.join(extensionContext.extensionPath, 'config', 'templates', `${id}.md`);
     if (fs.existsSync(templatePath)) {
         let content = fs.readFileSync(templatePath, 'utf-8');
         content = content.replace(/<!-- START:[\s\S]*?-->/g, '')
@@ -105,7 +114,8 @@ export async function handleApplySelection(selection: { subcategories: string[];
     }
     // Write to .github/copilot-instructions.md, backup if exists
     try {
-        const githubDir = path.join(extensionPath, '.github');
+        const workspaceRoot = getWorkspaceRoot();
+        const githubDir = path.join(workspaceRoot, '.github');
         if (!fs.existsSync(githubDir)) { fs.mkdirSync(githubDir); }
         const outFile = path.join(githubDir, 'copilot-instructions.md');
         const bakFile = path.join(githubDir, 'copilot-instructions.bak.md');
@@ -117,66 +127,6 @@ export async function handleApplySelection(selection: { subcategories: string[];
     } catch (err: any) {
         vscode.window.showErrorMessage('Failed to generate .github/copilot-instructions.md: ' + (err && err.message ? err.message : String(err)));
     }
-}
-
-// Loads and parses the existing copilot-instructions.md file, returning a map of found blocks and warnings for missing hierarchy
-export async function loadCopilotInstructions(): Promise<{ blocks: Record<string, string>, warnings: string[] }> {
-    const filePath = path.join(extensionPath, '.github', 'copilot-instructions.md');
-    const blocks: Record<string, string> = {};
-    const warnings: string[] = [];
-    if (!fs.existsSync(filePath)) {
-        vscode.window.showWarningMessage('No .github/copilot-instructions.md file found.');
-        return { blocks, warnings };
-    }
-    const content = fs.readFileSync(filePath, 'utf-8');
-    // Find all blocks by START/END comments
-    const blockRegex = /<!-- START: ([^\s]+) \(([^)]+)\) -->([\s\S]*?)<!-- END: \1 -->/g;
-    let match;
-    while ((match = blockRegex.exec(content)) !== null) {
-        const id = match[1];
-        const type = match[2];
-        const blockContent = match[3].trim();
-        blocks[id] = blockContent;
-    }
-    // Now check for hierarchy: if a feature exists but its subcategory or category is missing, warn
-    const config = await loadConfig();
-    for (const cat of config.categories) {
-        if (!blocks[cat.id]) {
-            // Check if any subcategory or feature under this category exists
-            const subBlocks = cat.subcategories.filter((sub: any) => blocks[sub.id] || (sub.features && sub.features.some((f: any) => blocks[f.id])));
-            if (subBlocks.length > 0) {
-                warnings.push(`Category block missing: ${cat.id} (${cat.name}) but subcategory/feature blocks exist.`);
-            }
-            for (const sub of cat.subcategories) {
-                if (!blocks[sub.id]) {
-                    // Check if any feature under this subcategory exists
-                    const featBlocks = (sub.features || []).filter((f: any) => blocks[f.id]);
-                    if (featBlocks.length > 0) {
-                        warnings.push(`Subcategory block missing: ${sub.id} (${sub.name}) but feature blocks exist.`);
-                    }
-                }
-            }
-        }
-    }
-    return { blocks, warnings };
-}
-
-// --- Immediate apply/remove for subcategory/feature ---
-export async function handleApplySubcategory(subcategoryId: string, toast?: string) {
-    // Find all features for this subcategory and apply all defaultFeatures
-    const configLocal = await loadConfig();
-    let subLocal, catLocal;
-    for (const c of configLocal.categories) {
-        for (const s of c.subcategories) {
-            if (s.id === subcategoryId) { subLocal = s; catLocal = c; break; }
-        }
-    }
-    if (!subLocal || !catLocal) { return; }
-    // Gather all default features for this subcategory
-    const defaultFeatures = subLocal.defaultFeatures || [];
-    const selection = { subcategories: [subLocal.id], features: defaultFeatures };
-    currentSelection = selection;
-    await handleApplySelection(selection, toast);
 }
 
 export async function handleRemoveSubcategory(subcategoryId: string, toast?: string) {
@@ -191,7 +141,8 @@ export async function handleRemoveSubcategory(subcategoryId: string, toast?: str
     }
     if (!subLocal || !catLocal) { return; }
     // Remove subcategory block and all its features
-    const githubDir = path.join(extensionPath, '.github');
+    const workspaceRoot = getWorkspaceRoot();
+    const githubDir = path.join(workspaceRoot, '.github');
     const outFile = path.join(githubDir, 'copilot-instructions.md');
     if (!fs.existsSync(outFile)) { return; }
     let content = fs.readFileSync(outFile, 'utf-8');
@@ -248,7 +199,8 @@ export async function handleApplyFeature(featureId: string, parentSubId: string,
 
 export async function handleRemoveFeature(featureId: string, toast?: string) {
     // Remove only the feature block for this feature
-    const githubDir2 = path.join(extensionPath, '.github');
+    const workspaceRoot = getWorkspaceRoot();
+    const githubDir2 = path.join(workspaceRoot, '.github');
     const outFile2 = path.join(githubDir2, 'copilot-instructions.md');
     if (!fs.existsSync(outFile2)) { return; }
     let content = fs.readFileSync(outFile2, 'utf-8');
@@ -260,4 +212,73 @@ export async function handleRemoveFeature(featureId: string, toast?: string) {
     if (toast) {
         vscode.window.showInformationMessage(toast);
     }
+}
+
+// Loads and parses the existing copilot-instructions.md file, returning a map of found blocks and warnings for missing hierarchy
+export async function loadCopilotInstructions(): Promise<{ blocks: Record<string, string>, warnings: string[] }> {
+    const workspaceRoot = getWorkspaceRoot();
+    const filePath = path.join(workspaceRoot, '.github', 'copilot-instructions.md');
+    const blocks: Record<string, string> = {};
+    const warnings: string[] = [];
+    if (!fs.existsSync(filePath)) {
+        vscode.window.showWarningMessage('No .github/copilot-instructions.md file found.');
+        return { blocks, warnings };
+    }
+    const content = fs.readFileSync(filePath, 'utf-8');
+    // Find all blocks by START/END comments
+    const blockRegex = /<!-- START: ([^\s]+) \(([^)]+)\) -->([\s\S]*?)<!-- END: \1 -->/g;
+    let match;
+    while ((match = blockRegex.exec(content)) !== null) {
+        const id = match[1];
+        const type = match[2];
+        const blockContent = match[3].trim();
+        blocks[id] = blockContent;
+    }
+    // Now check for hierarchy: if a feature exists but its subcategory or category is missing, warn
+    const config = await loadConfig();
+    for (const cat of config.categories) {
+        if (!blocks[cat.id]) {
+            // Check if any subcategory or feature under this category exists
+            const subBlocks = cat.subcategories.filter((sub: any) => blocks[sub.id] || (sub.features && sub.features.some((f: any) => blocks[f.id])));
+            if (subBlocks.length > 0) {
+                warnings.push(`Category block missing: ${cat.id} (${cat.name}) but subcategory/feature blocks exist.`);
+            }
+            for (const sub of cat.subcategories) {
+                if (!blocks[sub.id]) {
+                    // Check if any feature under this subcategory exists
+                    const featBlocks = (sub.features || []).filter((f: any) => blocks[f.id]);
+                    if (featBlocks.length > 0) {
+                        warnings.push(`Subcategory block missing: ${sub.id} (${sub.name}) but feature blocks exist.`);
+                    }
+                }
+            }
+        }
+    }
+    return { blocks, warnings };
+}
+
+export async function handleApplySubcategory(subcategoryId: string, toast?: string) {
+    // Add the subcategory to the current selection if not present
+    if (!currentSelection.subcategories.includes(subcategoryId)) {
+        currentSelection.subcategories.push(subcategoryId);
+    }
+    // Remove all features under this subcategory that are not in the config (defensive)
+    const config = await loadConfig();
+    let sub = null;
+    for (const c of config.categories) {
+        for (const s of c.subcategories) {
+            if (s.id === subcategoryId) {
+                sub = s;
+                break;
+            }
+        }
+    }
+    if (sub && sub.featureGroups) {
+        for (const group of sub.featureGroups) {
+            for (const feat of group.features || []) {
+                // Do not auto-add features, just ensure the subcategory is present
+            }
+        }
+    }
+    await handleApplySelection({ subcategories: currentSelection.subcategories, features: currentSelection.features }, toast);
 }
