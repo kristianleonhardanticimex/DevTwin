@@ -112,20 +112,18 @@ export async function handleApplySelection(selection: { subcategories: string[];
             }
         }
     }
-    // Write to .github/copilot-instructions.md, backup if exists
+    // Write to .github/copilot-instructions.md (no backup)
     try {
         const workspaceRoot = getWorkspaceRoot();
         const githubDir = path.join(workspaceRoot, '.github');
         if (!fs.existsSync(githubDir)) { fs.mkdirSync(githubDir); }
         const outFile = path.join(githubDir, 'copilot-instructions.md');
-        const bakFile = path.join(githubDir, 'copilot-instructions.bak.md');
-        if (fs.existsSync(outFile)) { fs.copyFileSync(outFile, bakFile); }
         fs.writeFileSync(outFile, output, 'utf-8');
         if (toast) {
             vscode.window.showInformationMessage(toast);
         }
     } catch (err: any) {
-        vscode.window.showErrorMessage('Failed to generate .github/copilot-instructions.md: ' + (err && err.message ? err.message : String(err)));
+        vscode.window.showErrorMessage('DevTwin: Failed to write copilot-instructions.md: ' + (err && err.message ? err.message : String(err)));
     }
 }
 
